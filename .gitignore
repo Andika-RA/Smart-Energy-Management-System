@@ -1,0 +1,129 @@
+# ==========================================
+# ENVIRONMENT & SECRETS
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# JWT, OAuth, API Keys
+*.key
+*.pem
+*.crt
+*.p12
+
+# ==========================================
+# PYTHON
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Build & Cache
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Machine Learning Models
+python-ml-service/models/*.pkl
+python-ml-service/models/*.joblib
+python-ml-service/models/*.model
+
+# ==========================================
+# NODE.JS / EXPRESS / OAUTH SERVER
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# Build output
+dist/
+build/
+
+# ==========================================
+# PHP
+# ==========================================
+vendor/
+composer.lock
+
+# ==========================================
+# DOCKER
+# ==========================================
+.docker/
+docker-data/
+
+# Docker volumes (local)
+mysql-data/
+rabbitmq-data/
+grafana-data/
+
+# ==========================================
+# NODE-RED
+# ==========================================
+iot/node-red-data/.config.*
+iot/node-red-data/.sessions.*
+iot/node-red-data/projects/.config.*
+iot/node-red-data/lib/
+
+# ==========================================
+# DATABASE DUMPS
+# ==========================================
+*.sql.gz
+*.dump
+*.bak
+
+# ==========================================
+# LOG FILES
+# ==========================================
+logs/
+*.log
+*.out
+*.err
+
+# ==========================================
+# MONITORING
+# ==========================================
+monitoring/grafana-data/
+monitoring/prometheus-data/
+
+# ==========================================
+# KUBERNETES SECRETS
+# ==========================================
+k8s/secrets.local.yaml
+k8s/*.secret.yaml
+
+# ==========================================
+# OS FILES
+# ==========================================
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# IDE / EDITOR
+# ==========================================
+.vscode/
+.idea/
+*.iml
+
+# ==========================================
+# TEMP FILES
+# ==========================================
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
