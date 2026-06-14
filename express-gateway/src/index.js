@@ -19,6 +19,18 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/health", (req, res) => {
+  res.json({
+    status: "success",
+    code: 200,
+    data: {
+      gateway: "healthy"
+    },
+    message: "API Gateway healthy",
+    service: "api-gateway"
+  });
+});
+
 app.listen(port, () => {
   console.log(`API Gateway berjalan pada port ${port}`);
 });
