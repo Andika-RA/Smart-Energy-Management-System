@@ -30,6 +30,8 @@ def standard_response(status: str, code: int, data: dict | list | None, message:
     }
 
 class PowerIn(BaseModel):
+    id: str
+    timestamp: str
     hour: int = Field(..., ge=0, le=23)
     day_of_week: int = Field(..., ge=0, le=6)
     temperature: float
@@ -37,6 +39,8 @@ class PowerIn(BaseModel):
     zone: str
 
 class GridIn(BaseModel):
+    id: str
+    timestamp: str
     voltage: float = Field(..., ge=0)
     current: float = Field(..., ge=0)
     power_factor: float = Field(..., ge=0.0, le=1.0)
@@ -44,6 +48,8 @@ class GridIn(BaseModel):
     humidity: float = Field(..., ge=0, le=100)
 
 class SensorIn(BaseModel):
+    id: str
+    timestamp: str
     sensor_value: float = Field(..., ge=0)
     timestamp_hour: int = Field(..., ge=0, le=23)
     rolling_mean_1h: float
@@ -69,6 +75,8 @@ def predict_power(d: PowerIn):
     X = b['scaler'].transform([[d.hour, d.day_of_week, d.temperature, d.prev_demand, zone_enc]])
     pred_demand = float(b['model'].predict(X)[0])
     data = {
+        "id": d.id,
+        "timestamp": d.timestamp,
         "predicted_demand_kw": round(pred_demand, 2),
         "status": "Tinggi" if pred_demand > 300 else "Normal"
     }
@@ -84,6 +92,8 @@ def predict_grid_quality(d: GridIn):
     proba = b['model'].predict_proba(X)[0]
     label = b['le_status'].inverse_transform([pred])[0]
     data = {
+        "id": d.id,
+        "timestamp": d.timestamp,
         "grid_status": label,
         "confidence": round(float(proba.max()), 3),
         "probabilities": dict(zip(b['le_status'].classes_.tolist(), proba.round(3).tolist()))
@@ -99,6 +109,8 @@ def detect_anomaly(d: SensorIn):
     score = float(b['model'].score_samples(X)[0])
     is_anom = score < -0.1
     data = {
+        "id": d.id,
+        "timestamp": d.timestamp,
         "is_anomaly": is_anom,
         "anomaly_score": round(-score, 4),
         "severity": "Kritis" if score < -0.3 else "Peringatan" if is_anom else "Normal"
@@ -128,5 +140,5 @@ def predict_batch_power(data: BatchPowerIn):
             zone_enc = 0
         X = b['scaler'].transform([[d.hour, d.day_of_week, d.temperature, d.prev_demand, zone_enc]])
         pred = float(b['model'].predict(X)[0])
-        results.append({"zone": d.zone, "predicted_demand_kw": round(pred, 2)})
+        results.append({"id": d.id, "zone": d.zone, "predicted_demand_kw": round(pred, 2)})
     return standard_response("success", 200, results, f"Batch prediksi untuk {len(results)} data berhasil")

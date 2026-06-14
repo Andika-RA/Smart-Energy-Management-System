@@ -4,6 +4,7 @@ import joblib
 import numpy as np
 import time
 import os
+from datetime import datetime
 
 def start_consumer():
     time.sleep(10)
@@ -23,6 +24,8 @@ def start_consumer():
         def callback(ch, method, props, body):
             try:
                 event = json.loads(body)
+                event_id = event.get('id', 'unknown-id')
+                event_timestamp = event.get('timestamp', datetime.utcnow().isoformat() + "Z")
                 sensor_val = event.get('sensor_value', 0)
                 hour = event.get('timestamp_hour', 0)
                 rolling_mean = event.get('rolling_mean_1h', sensor_val)
@@ -32,9 +35,11 @@ def start_consumer():
                 score = float(b_anomaly['model'].score_samples(X)[0])
                 is_anom = score < -0.1
                 status_text = "ANOMALI DETECTED!" if is_anom else "Normal"
-                print(f"[ML Consumer] Zone: {zone} | Sensor: {sensor_val} | Status: {status_text} | Score: {score:.4f}")
+                print(f"[ML Consumer] ID: {event_id} | Zone: {zone} | Sensor: {sensor_val} | Status: {status_text} | Score: {score:.4f}")
                 if is_anom:
                     alert_payload = {
+                        "id": event_id,
+                        "timestamp": event_timestamp,
                         "zone": zone,
                         "alert_type": "ENERGY_SPIKE",
                         "severity": "Kritis" if score < -0.3 else "Peringatan",
@@ -51,7 +56,6 @@ def start_consumer():
             except Exception as e:
                 print(f"[Error] Gagal memproses event: {e}")
                 ch.basic_reject(delivery_tag=method.delivery_tag, requeue=False)
-                
         ch.basic_consume(queue='energy.new', on_message_callback=callback)
         print("[*] ML Consumer listening on queue 'energy.new'...")
         ch.start_consuming()

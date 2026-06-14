@@ -8,11 +8,15 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import r2_score, classification_report, accuracy_score
 
 def train_and_evaluate():
-    print("Memuat 3 dataset Energi Pintar...")
-    df_power = pd.read_csv("data/power_history.csv")
-    df_grid = pd.read_csv("data/grid_quality.csv")
-    df_sensors = pd.read_csv("data/energy_sensors.csv")
-    os.makedirs("models", exist_ok=True)
+    print("Memuat 3 dataset Energi Pintar (dengan ID & Timestamp)...")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATA_DIR = os.path.join(BASE_DIR, "data")
+    df_power = pd.read_csv(os.path.join(DATA_DIR, "power_history.csv"))
+    df_grid = pd.read_csv(os.path.join(DATA_DIR, "grid_quality.csv"))
+    df_sensors = pd.read_csv(os.path.join(DATA_DIR, "energy_sensors.csv"))
+    MODEL_DIR = os.path.join(BASE_DIR, "models")
+    os.makedirs(MODEL_DIR, exist_ok=True)
+
     print("\n--- MODEL 1: REGRESI ---")
     POWER_FEATS = ['hour', 'day_of_week', 'temperature', 'prev_demand', 'zone_enc']
     le_zone = LabelEncoder()
@@ -27,6 +31,7 @@ def train_and_evaluate():
     y_pred_p = mdl_p.predict(X_test_p)
     print(f"Cross-Val R^2 Score: {cv_p.mean():.4f} (+/- {cv_p.std():.4f})")
     print(f"Test Set R^2 Score : {r2_score(y_test_p, y_pred_p):.4f}")
+
     print("\n--- MODEL 2: KLASIFIKASI MULTI-KELAS ---")
     GRID_FEATS = ['voltage', 'current', 'power_factor', 'temperature', 'humidity']
     le_status = LabelEncoder()
@@ -41,6 +46,7 @@ def train_and_evaluate():
     print(f"Cross-Val Accuracy : {cv_g.mean():.4f} (+/- {cv_g.std():.4f})")
     print("Classification Report (Test Set):")
     print(classification_report(y_test_g, y_pred_g, target_names=le_status.classes_))
+
     print("\n--- MODEL 3: DETEKSI ANOMALI ---")
     ANOMALY_FEATS = ['sensor_value', 'timestamp_hour', 'rolling_mean_1h', 'z_score']
     scaler_s = StandardScaler()
@@ -51,26 +57,30 @@ def train_and_evaluate():
     anomaly_count = np.sum(pred_anomalies == -1)
     print(f"Total data diproses : {len(X_s)}")
     print(f"Anomali terdeteksi  : {anomaly_count} ({(anomaly_count/len(X_s))*100:.2f}%)")
+
     print("\nMenyimpan seluruh objek ML ke models/smartcity_models.pkl...")
-    joblib.dump({
-        'power_regression': {
-            'model': mdl_p, 
-            'scaler': scaler_p, 
-            'le_zone': le_zone, 
-            'features': POWER_FEATS
+    joblib.dump(
+        {
+            'power_regression': {
+                'model': mdl_p,
+                'scaler': scaler_p,
+                'le_zone': le_zone,
+                'features': POWER_FEATS
+            },
+            'grid_classification': {
+                'model': mdl_g,
+                'scaler': scaler_g,
+                'le_status': le_status,
+                'features': GRID_FEATS
+            },
+            'anomaly': {
+                'model': mdl_s,
+                'scaler': scaler_s,
+                'features': ANOMALY_FEATS
+            }
         },
-        'grid_classification': {
-            'model': mdl_g, 
-            'scaler': scaler_g, 
-            'le_status': le_status, 
-            'features': GRID_FEATS
-        },
-        'anomaly': {
-            'model': mdl_s, 
-            'scaler': scaler_s, 
-            'features': ANOMALY_FEATS
-        }
-    }, 'models/smartcity_models.pkl')
+        os.path.join(MODEL_DIR, "smartcity_models.pkl")
+    )
     print("Berhasil! File models/smartcity_models.pkl siap digunakan.")
 
 if __name__ == "__main__":
