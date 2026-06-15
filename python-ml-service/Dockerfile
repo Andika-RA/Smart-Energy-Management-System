@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN python generate_datasets.py
+RUN python generate_dataset.py
 RUN python train_models.py
 
 EXPOSE 5000

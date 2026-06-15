@@ -21,13 +21,14 @@ services:
       test: ["CMD","mysqladmin","ping","-h","localhost"]
       interval: 10s
       timeout: 5s
-       retries: 5
+      retries: 5
  
   rabbitmq:
     image: rabbitmq:3.12-management
     ports: ["15672:15672"]
     volumes: [rabbitmq-data:/var/lib/rabbitmq]
     networks: [smartcity-net]
+  
   mosquitto:
     image: eclipse-mosquitto:2.0
     ports: ["1883:1883"]
@@ -53,13 +54,13 @@ services:
     depends_on: {mysql: {condition: service_healthy}}
     networks: [smartcity-net]
   
-  traffic-service:
-    build: ./php-traffic
+  power-service:
+    build: ./php-power
     environment: {DB_HOST: mysql, RABBITMQ_HOST: rabbitmq}
     networks: [smartcity-net]
   
-  env-service:
-    build: ./php-environment
+  grid-service:
+    build: ./php-grid
     environment: {DB_HOST: mysql, RABBITMQ_HOST: rabbitmq}
     networks: [smartcity-net]
  
@@ -74,6 +75,13 @@ services:
     ports: ["1880:1880"]
     volumes: [./iot/node-red-data:/data]
     networks: [smartcity-net]
+
+  iot-simulator:
+    build: ./iot
+    depends_on:
+      - mosquitto
+    networks:
+      - smartcity-net
  
   # ── MONITORING ─────────────────────────────────────────────────────────────
   prometheus:
