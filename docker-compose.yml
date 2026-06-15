@@ -1,0 +1,35 @@
+version: "3.9"
+networks:
+  smartcity-net:
+    driver: bridge
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: smartcity
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d 
+    networks:
+      - smartcity-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  citizen-service:
+    build: ./php-citizen
+    ports:
+      - "8000:80" 
+    environment:
+      DB_HOST: mysql
+      DB_NAME: smartcity
+      DB_USER: root
+      DB_PASS: rootpass
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - smartcity-net

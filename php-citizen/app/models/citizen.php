@@ -6,7 +6,7 @@ use PDO;
 
 class citizen {
     private PDO $conn;
-    private string $table_name = "citizen_citizens"; // Prefix sesuai best practice dokumen
+    private string $table_name = "citizen_citizens";
 
     public function __construct() {
         $db = new Database();
