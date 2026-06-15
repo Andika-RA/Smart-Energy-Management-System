@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const requestLogger = require("./middleware/logger");
 const { globalLimiter } = require("./middleware/rateLimit");
+const registerProxyRoutes = require("./routes/proxy");
 
 const app = express();
 const port = process.env.PORT || 3060;
@@ -30,6 +31,8 @@ app.get("/health", (req, res) => {
     service: "api-gateway"
   });
 });
+
+registerProxyRoutes(app);
 
 app.listen(port, () => {
   console.log(`API Gateway berjalan pada port ${port}`);
