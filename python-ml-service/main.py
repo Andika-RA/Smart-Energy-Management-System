@@ -41,6 +41,7 @@ class PowerIn(BaseModel):
 class GridIn(BaseModel):
     id: str
     timestamp: str
+    zone: str
     voltage: float = Field(..., ge=0)
     current: float = Field(..., ge=0)
     power_factor: float = Field(..., ge=0.0, le=1.0)
@@ -50,6 +51,7 @@ class GridIn(BaseModel):
 class SensorIn(BaseModel):
     id: str
     timestamp: str
+    zone: str
     sensor_value: float = Field(..., ge=0)
     timestamp_hour: int = Field(..., ge=0, le=23)
     rolling_mean_1h: float
