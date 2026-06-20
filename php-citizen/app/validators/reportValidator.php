@@ -1,5 +1,5 @@
 <?php
-namespace App\validators;
+namespace app\validators;
 
 class reportValidator {
     public static function validate(array $data): array {
