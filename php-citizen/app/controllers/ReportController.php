@@ -4,7 +4,7 @@ use App\Models\Report;
 use App\Services\RabbitMQPublisher;
 use App\Validators\ReportValidator;
 
-class ReportController {
+class reportController {
     private Report $model;
     private RabbitMQPublisher $publisher;
 
@@ -13,9 +13,12 @@ class ReportController {
         $this->publisher = new RabbitMQPublisher();
     }
 
-    // GET /api/reports
+   // GET /api/reports
     public function index() {
-        $reports = $this->model->findAll();
+        $status = $_GET['status'] ?? null;
+        $zone_id = $_GET['zone_id'] ?? null;
+        
+        $reports = $this->model->findAllWithFilter($status, $zone_id ? (int)$zone_id : null);
         sendResponse("success", 200, $reports, "Daftar laporan berhasil diambil");
     }
 

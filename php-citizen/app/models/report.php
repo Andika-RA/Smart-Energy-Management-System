@@ -3,7 +3,7 @@ namespace app\models;
 use app\database;
 use PDO;
 
-class Report {
+class report {
     private PDO $conn;
     private string $table = "citizen_reports";
 
@@ -30,8 +30,22 @@ class Report {
         return $data;
     }
 
-    public function findAll(): array {
-        $stmt = $this->conn->query("SELECT * FROM {$this->table} ORDER BY created_at DESC");
+    public function findAllWithFilter(?string $status, ?int $zone_id): array {
+        $query = "SELECT * FROM {$this->table} WHERE 1=1";
+        $params = [];
+
+        if ($status) {
+            $query .= " AND status = ?";
+            $params[] = $status;
+        }
+        if ($zone_id) {
+            $query .= " AND zone_id = ?";
+            $params[] = $zone_id;
+        }
+        
+        $query .= " ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
