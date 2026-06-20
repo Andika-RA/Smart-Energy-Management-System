@@ -34,4 +34,10 @@ class citizen {
         
         return $data;
     }
+    public function findById(int $id): ?array {
+        $stmt = $this->conn->prepare("SELECT id, nik, name, email, phone, zone_id, role, created_at FROM citizen_citizens WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+        return $result ?: null;
+    }
 }
