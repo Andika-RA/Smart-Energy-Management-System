@@ -2,7 +2,7 @@
     {
         "id": "1b72ad3e978b41bf",
         "type": "tab",
-        "label": "Flow 1",
+        "label": "Smart City ML Flow",
         "disabled": false,
         "info": "",
         "env": []
@@ -12,17 +12,6 @@
         "type": "mqtt-broker",
         "name": "HiveMQ (Wokwi)",
         "broker": "broker.hivemq.com",
-        "port": "1883",
-        "clientid": "",
-        "usetls": false,
-        "keepalive": "60",
-        "cleansession": true
-    },
-    {
-        "id": "broker_mosquitto",
-        "type": "mqtt-broker",
-        "name": "Mosquitto (Lokal)",
-        "broker": "mosquitto",
         "port": "1883",
         "clientid": "",
         "usetls": false,
@@ -40,25 +29,7 @@
         "broker": "broker_hivemq",
         "inputs": 0,
         "x": 130,
-        "y": 180,
-        "wires": [
-            [
-                "func_grid"
-            ]
-        ]
-    },
-    {
-        "id": "mqtt_grid_local",
-        "type": "mqtt in",
-        "z": "1b72ad3e978b41bf",
-        "name": "Local: Grid",
-        "topic": "city/+/grid",
-        "qos": "0",
-        "datatype": "json",
-        "broker": "broker_mosquitto",
-        "inputs": 0,
-        "x": 130,
-        "y": 220,
+        "y": 120,
         "wires": [
             [
                 "func_grid"
@@ -70,10 +41,10 @@
         "type": "function",
         "z": "1b72ad3e978b41bf",
         "name": "Enrich Grid Data",
-        "func": "let d = msg.payload;\n// Hanya tambah ID & Waktu jika kosong (dari Wokwi)\nif (!d.id) {\n    d.id = \"WKW-GRD-\" + Date.now();\n    d.timestamp = new Date().toISOString();\n}\nmsg.payload = d;\nreturn msg;",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-GRD-\" + Date.now();\n    d.timestamp = new Date().toISOString();\n}\nmsg.payload = d;\nreturn msg;",
         "outputs": 1,
         "x": 350,
-        "y": 200,
+        "y": 120,
         "wires": [
             [
                 "http_grid"
@@ -90,7 +61,7 @@
         "paytoqs": "ignore",
         "url": "http://python-ml:5000/predict/grid-quality",
         "x": 580,
-        "y": 200,
+        "y": 120,
         "wires": [
             [
                 "debug_grid"
@@ -106,7 +77,7 @@
         "console": "false",
         "complete": "payload",
         "x": 850,
-        "y": 200,
+        "y": 120,
         "wires": []
     },
     {
@@ -120,25 +91,7 @@
         "broker": "broker_hivemq",
         "inputs": 0,
         "x": 130,
-        "y": 300,
-        "wires": [
-            [
-                "func_power"
-            ]
-        ]
-    },
-    {
-        "id": "mqtt_power_local",
-        "type": "mqtt in",
-        "z": "1b72ad3e978b41bf",
-        "name": "Local: Power",
-        "topic": "city/+/power",
-        "qos": "0",
-        "datatype": "json",
-        "broker": "broker_mosquitto",
-        "inputs": 0,
-        "x": 130,
-        "y": 340,
+        "y": 220,
         "wires": [
             [
                 "func_power"
@@ -153,7 +106,7 @@
         "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-PWR-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.hour = now.getHours();\n    let day = now.getDay();\n    d.day_of_week = day === 0 ? 6 : day - 1;\n}\nmsg.payload = d;\nreturn msg;",
         "outputs": 1,
         "x": 350,
-        "y": 320,
+        "y": 220,
         "wires": [
             [
                 "http_power"
@@ -170,7 +123,7 @@
         "paytoqs": "ignore",
         "url": "http://python-ml:5000/predict/power",
         "x": 570,
-        "y": 320,
+        "y": 220,
         "wires": [
             [
                 "debug_power"
@@ -185,8 +138,8 @@
         "active": true,
         "console": "false",
         "complete": "payload",
-        "x": 860,
-        "y": 320,
+        "x": 850,
+        "y": 220,
         "wires": []
     },
     {
@@ -199,26 +152,8 @@
         "datatype": "json",
         "broker": "broker_hivemq",
         "inputs": 0,
-        "x": 140,
-        "y": 420,
-        "wires": [
-            [
-                "func_sensor"
-            ]
-        ]
-    },
-    {
-        "id": "mqtt_sensor_local",
-        "type": "mqtt in",
-        "z": "1b72ad3e978b41bf",
-        "name": "Local: Sensor",
-        "topic": "city/+/sensor",
-        "qos": "0",
-        "datatype": "json",
-        "broker": "broker_mosquitto",
-        "inputs": 0,
-        "x": 140,
-        "y": 460,
+        "x": 130,
+        "y": 320,
         "wires": [
             [
                 "func_sensor"
@@ -233,7 +168,7 @@
         "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-SNS-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.timestamp_hour = now.getHours();\n}\nmsg.payload = d;\nreturn msg;",
         "outputs": 1,
         "x": 350,
-        "y": 440,
+        "y": 320,
         "wires": [
             [
                 "http_sensor"
@@ -250,7 +185,7 @@
         "paytoqs": "ignore",
         "url": "http://python-ml:5000/detect/anomaly",
         "x": 580,
-        "y": 440,
+        "y": 320,
         "wires": [
             [
                 "debug_sensor"
@@ -266,7 +201,7 @@
         "console": "false",
         "complete": "payload",
         "x": 860,
-        "y": 440,
+        "y": 320,
         "wires": []
     }
 ]

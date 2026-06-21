@@ -4,6 +4,8 @@
 .env
 .env.*
 !.env.example
+**/secrets.h
+!**/secrets.example.h
 
 # JWT, OAuth, API Keys
 *.key

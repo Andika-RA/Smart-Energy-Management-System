@@ -78,6 +78,7 @@ services:
 
   iot-simulator:
     build: ./iot
+    env_file: .env
     depends_on:
       - mosquitto
     networks:
