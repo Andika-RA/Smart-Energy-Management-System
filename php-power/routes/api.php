@@ -1,4 +1,4 @@
 Route::get(
-    '/power',
-    'PowerController@index'
+'/power',
+'PowerController@index'
 );
