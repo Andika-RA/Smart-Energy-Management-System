@@ -8,7 +8,7 @@ class report {
     private string $table = "citizen_reports";
 
     public function __construct() {
-        $this->conn = (new Database())->getConnection();
+        $this->conn = (new database())->getConnection();
     }
 
     public function create(array $data): array {

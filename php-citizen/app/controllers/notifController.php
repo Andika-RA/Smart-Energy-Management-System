@@ -3,10 +3,10 @@ namespace app\controllers;
 use app\models\notification;
 
 class notifController {
-    private Notification $model;
+    private notification $model;
 
     public function __construct() {
-        $this->model = new Notification();
+        $this->model = new notification();
     }
 
     // GET /api/notifications

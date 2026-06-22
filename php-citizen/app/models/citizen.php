@@ -1,7 +1,7 @@
 <?php
 // app/models/citizen.php
-namespace App\models;
-use App\database;
+namespace app\models;
+use app\database;
 use PDO;
 
 class citizen {
@@ -9,7 +9,7 @@ class citizen {
     private string $table_name = "citizen_citizens";
 
     public function __construct() {
-        $db = new Database();
+        $db = new database();
         $this->conn = $db->getConnection();
     }
 

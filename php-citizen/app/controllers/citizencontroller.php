@@ -14,7 +14,7 @@ class citizenController {
         $data = json_decode(file_get_contents("php://input"), true);
         
         try {
-            $validatedData = CitizenValidator::validate($data);
+            $validatedData = citizenValidator::validate($data);
             $validatedData['created_at'] = date('Y-m-d H:i:s');
             $validatedData['role'] = 'warga';
 

@@ -1,15 +1,15 @@
 <?php
-namespace App\Controllers;
-use App\Models\Report;
-use App\Services\RabbitMQPublisher;
-use App\Validators\ReportValidator;
+namespace app\controllers;
+use app\models\report;
+use app\services\RabbitMQPublisher;
+use app\validators\reportValidator;
 
 class reportController {
-    private Report $model;
+    private report $model;
     private RabbitMQPublisher $publisher;
 
     public function __construct() {
-        $this->model = new Report();
+        $this->model = new report();
         $this->publisher = new RabbitMQPublisher();
     }
 
@@ -29,7 +29,7 @@ class reportController {
         $data['citizen_id'] = $headers['X-Citizen-Id'] ?? $data['citizen_id'] ?? 1; 
 
         try {
-            $validated = ReportValidator::validate($data);
+            $validated = reportValidator::validate($data);
             $record = $this->model->create($validated);
             
             $this->publisher->publish('report.submitted', [
