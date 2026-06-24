@@ -10,7 +10,7 @@ class database {
     public function getConnection(): PDO {
         if ($this->connection === null) {
             $host = getenv('DB_HOST') ?: 'localhost';
-            $db_name = getenv('DB_NAME') ?: 'smartenergy';
+            $db_name = getenv('DB_NAME') ?: 'smartcity';
             $username = getenv('DB_USER') ?: 'root';
             $password = getenv('DB_PASS') ?: 'rootpass';
 
