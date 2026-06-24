@@ -3,8 +3,7 @@
 header('Content-Type: application/json');
 
 echo json_encode([
-    "service"=>"Power Service",
-    "status"=>"running",
+    "message"=>"Power Service Running",
 
     "models"=>[
         "PowerDemand",
