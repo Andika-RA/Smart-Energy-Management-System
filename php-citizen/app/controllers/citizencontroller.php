@@ -16,7 +16,7 @@ class citizenController {
         try {
             $validatedData = citizenValidator::validate($data);
             $validatedData['created_at'] = date('Y-m-d H:i:s');
-            $validatedData['role'] = 'warga';
+            $validatedData['role'] = 'resident';
 
             $record = $this->model->create($validatedData);
             sendResponse("success", 201, $record, "Warga berhasil didaftarkan");

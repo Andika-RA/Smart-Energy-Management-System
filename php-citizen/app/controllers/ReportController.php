@@ -51,7 +51,12 @@ class reportController {
         if (empty($data['status'])) {
             sendResponse("error", 400, null, "Status baru wajib diisi");
         }
+        $allowedStatuses = ['pending', 'investigating', 'resolved'];
+        if (!in_array($data['status'], $allowedStatuses)) {
+            sendResponse("error", 400, null, "Status tidak valid. Gunakan: pending, investigating, atau resolved.");
+        }
 
+        $this->model->updateStatus((int)$id, $data['status']);
         $this->model->updateStatus((int)$id, $data['status']);
         sendResponse("success", 200, ["id" => $id, "status" => $data['status']], "Status laporan diperbarui");
     }

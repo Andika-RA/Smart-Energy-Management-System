@@ -32,8 +32,8 @@ try {
         $citizens = $stmt->fetchAll();
         
         // Notification
-        if (count($citizens) > 0) {
-            $insertStmt = $db->prepare("INSERT INTO citizen_notifications (citizen_id, title, body, is_read, created_at) VALUES (?, ?, ?, 0, ?)");
+       if (count($citizens) > 0) {
+            $insertStmt = $db->prepare("INSERT INTO citizen_notifications (citizen_id, is_broadcast, title, body, is_read, created_at) VALUES (?, 0, ?, ?, 0, ?)");
             $now = date('Y-m-d H:i:s');
             $body = "Peringatan! Terdeteksi anomali sistem (Skor: {$data['anomaly_score']}) di zona Anda.";
             
