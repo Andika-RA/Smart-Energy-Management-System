@@ -4,6 +4,26 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const mysql = require("mysql2/promise");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+
+function parseDuration(durationStr) {
+  const matches = durationStr.toString().match(/^(\d+)([hmds])$/);
+  if (!matches) return 3600 * 1000;
+  const value = parseInt(matches[1]);
+  const unit = matches[2];
+  switch (unit) {
+    case 's': return value * 1000;
+    case 'm': return value * 60 * 1000;
+    case 'h': return value * 3600 * 1000;
+    case 'd': return value * 24 * 3600 * 1000;
+    default: return 3600 * 1000;
+  }
+}
+
+function getMySQLDateTime(msFromNow) {
+  const date = new Date(Date.now() + msFromNow);
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -59,20 +79,48 @@ app.post("/oauth/token", async (req, res) => {
   } = req.body;
 
   let payload;
+  let user_id = null;
+  let user_type = "citizen";
 
   if (grant_type === "password") {
-    const validUser = username === (process.env.OAUTH_DEMO_USERNAME || "admin");
-    const validPassword = password === (process.env.OAUTH_DEMO_PASSWORD || "password");
-
-    if (!validUser || !validPassword) {
-      return sendResponse(res, "error", 401, null, "Invalid username or password");
+    if (!username || !password) {
+      return sendResponse(res, "error", 400, null, "username and password are required");
     }
 
-    payload = {
-      sub: username,
-      role: "admin",
-      scope: "smart-energy"
-    };
+    if (username === "admin" && password === "password") {
+      payload = {
+        sub: "admin",
+        role: "admin",
+        scope: "smart-energy"
+      };
+      user_type = "admin";
+    } else {
+      try {
+        const [rows] = await pool.query(
+          "SELECT * FROM citizen_citizens WHERE email = ? OR nik = ?",
+          [username, username]
+        );
+
+        if (rows.length === 0) {
+          return sendResponse(res, "error", 401, null, "Invalid username or password");
+        }
+
+        const citizen = rows[0];
+        if (password !== citizen.nik) {
+          return sendResponse(res, "error", 401, null, "Invalid username or password");
+        }
+
+        payload = {
+          sub: citizen.email,
+          role: citizen.role,
+          scope: citizen.role === "admin" ? "smart-energy" : "smart-energy:citizen"
+        };
+        user_id = citizen.id;
+        user_type = citizen.role;
+      } catch (err) {
+        return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+      }
+    }
   } else if (grant_type === "client_credentials") {
     if (!client_id || !client_secret) {
       return sendResponse(res, "error", 400, null, "client_id and client_secret are required");
@@ -100,6 +148,7 @@ app.post("/oauth/token", async (req, res) => {
         role: "service",
         scope: "internal"
       };
+      user_type = "service";
     } catch (err) {
       return sendResponse(res, "error", 500, null, "Database error: " + err.message);
     }
@@ -107,12 +156,37 @@ app.post("/oauth/token", async (req, res) => {
     return sendResponse(res, "error", 400, null, "Unsupported grant type");
   }
 
-  const token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
+  const access_token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
+  const refresh_token = crypto.randomBytes(40).toString("hex");
+
+  const accessExpiresMs = parseDuration(jwtExpiresIn);
+  const refreshExpiresMs = 7 * 24 * 3600 * 1000; // 7 days
+
+  const expires_at = getMySQLDateTime(accessExpiresMs);
+  const refresh_token_expires_at = getMySQLDateTime(refreshExpiresMs);
+
+  try {
+    await pool.query(
+      "INSERT INTO shared_oauth_tokens (client_id, user_id, user_type, access_token, expires_at, refresh_token, refresh_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [
+        client_id || "smart-city-client",
+        user_id,
+        user_type,
+        access_token,
+        expires_at,
+        refresh_token,
+        refresh_token_expires_at
+      ]
+    );
+  } catch (err) {
+    return sendResponse(res, "error", 500, null, "Failed to store token: " + err.message);
+  }
 
   return sendResponse(res, "success", 200, {
-    access_token: token,
+    access_token,
     token_type: "Bearer",
-    expires_in: jwtExpiresIn
+    expires_in: Math.floor(accessExpiresMs / 1000),
+    refresh_token
   }, "Token issued");
 });
 
