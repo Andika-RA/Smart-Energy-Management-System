@@ -1,5 +1,7 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const services = require("../config/services");
+const authMiddleware = require("../middleware/auth");
+const { authLimiter } = require("../middleware/rateLimit");
 
 function proxyErrorHandler(err, req, res) {
   res.status(502).json({
@@ -11,11 +13,13 @@ function proxyErrorHandler(err, req, res) {
 }
 
 function registerProxyRoutes(app) {
-  app.use("/api/citizens", createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { error: proxyErrorHandler } }));
-  app.use("/api/power", createProxyMiddleware({ target: services.power, changeOrigin: true, on: { error: proxyErrorHandler } }));
-  app.use("/api/grid", createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { error: proxyErrorHandler } }));
-  app.use("/predict", createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { error: proxyErrorHandler } }));
-  app.use("/detect", createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/api/citizens", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/api/reports", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/api/notifications", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/api/power", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/api/grid", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/predict", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { error: proxyErrorHandler } }));
+  app.use("/detect", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { error: proxyErrorHandler } }));
 }
 
 module.exports = registerProxyRoutes;
