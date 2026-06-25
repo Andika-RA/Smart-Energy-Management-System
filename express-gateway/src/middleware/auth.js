@@ -1,4 +1,7 @@
 const services = require("../config/services");
+const jwt = require("jsonwebtoken");
+
+const jwtSecret = process.env.JWT_SECRET || "change_this_secret";
 
 function getBearerToken(req) {
   const header = req.headers.authorization || "";
@@ -14,6 +17,17 @@ async function authMiddleware(req, res, next) {
   const token = getBearerToken(req);
 
   if (!token) {
+    return res.status(401).json({
+      status: "error",
+      code: 401,
+      message: "Unauthorized",
+      service: "api-gateway"
+    });
+  }
+
+  try {
+    jwt.verify(token, jwtSecret);
+  } catch (error) {
     return res.status(401).json({
       status: "error",
       code: 401,
