@@ -4,6 +4,7 @@ const express = require("express");
 const requestLogger = require("./middleware/logger");
 const { globalLimiter } = require("./middleware/rateLimit");
 const registerProxyRoutes = require("./routes/proxy");
+const { checkUpstreamServices } = require("./utils/healthCheck");
 
 const app = express();
 const port = process.env.PORT || 3060;
@@ -20,12 +21,18 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/health", (req, res) => {
+app.get("/health", async (req, res) => {
+  const upstream = await checkUpstreamServices();
+
   res.json({
     status: "success",
     code: 200,
     data: {
-      gateway: "healthy"
+      gateway: {
+        status: "healthy",
+        code: 200
+      },
+      upstream
     },
     message: "API Gateway healthy",
     service: "api-gateway"
