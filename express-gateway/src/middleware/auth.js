@@ -68,4 +68,16 @@ async function authMiddleware(req, res, next) {
   }
 }
 
-module.exports = authMiddleware;
+function adminMiddleware(req, res, next) {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      status: "error",
+      code: 403,
+      message: "Forbidden: Access denied. Admin role required.",
+      service: "api-gateway"
+    });
+  }
+  next();
+}
+
+module.exports = { authMiddleware, adminMiddleware };
