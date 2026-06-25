@@ -152,6 +152,51 @@ app.post("/oauth/token", async (req, res) => {
     } catch (err) {
       return sendResponse(res, "error", 500, null, "Database error: " + err.message);
     }
+  } else if (grant_type === "refresh_token") {
+    const { refresh_token } = req.body;
+    if (!refresh_token) {
+      return sendResponse(res, "error", 400, null, "refresh_token is required");
+    }
+
+    try {
+      const [tokenRows] = await pool.query(
+        "SELECT * FROM shared_oauth_tokens WHERE refresh_token = ? AND refresh_token_expires_at > NOW()",
+        [refresh_token]
+      );
+
+      if (tokenRows.length === 0) {
+        return sendResponse(res, "error", 401, null, "Invalid or expired refresh token");
+      }
+
+      const tokenRecord = tokenRows[0];
+
+      // Revoke/Delete the old refresh token record
+      await pool.query("DELETE FROM shared_oauth_tokens WHERE id = ?", [tokenRecord.id]);
+
+      user_id = tokenRecord.user_id;
+      user_type = tokenRecord.user_type;
+
+      if (user_id) {
+        const [userRows] = await pool.query(
+          "SELECT * FROM citizen_citizens WHERE id = ?",
+          [user_id]
+        );
+        const user = userRows[0];
+        payload = {
+          sub: user ? user.email : "unknown",
+          role: user ? user.role : user_type,
+          scope: (user ? user.role : user_type) === "admin" ? "smart-energy" : "smart-energy:citizen"
+        };
+      } else {
+        payload = {
+          sub: tokenRecord.client_id,
+          role: "service",
+          scope: "internal"
+        };
+      }
+    } catch (err) {
+      return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+    }
   } else {
     return sendResponse(res, "error", 400, null, "Unsupported grant type");
   }
@@ -190,14 +235,23 @@ app.post("/oauth/token", async (req, res) => {
   }, "Token issued");
 });
 
-app.post("/oauth/introspect", (req, res) => {
+app.post("/oauth/introspect", async (req, res) => {
   const token = req.body.token;
 
-  if (!token || revokedTokens.has(token)) {
+  if (!token) {
     return sendResponse(res, "success", 200, { active: false }, "Token inactive");
   }
 
   try {
+    const [tokenRows] = await pool.query(
+      "SELECT * FROM shared_oauth_tokens WHERE access_token = ? AND expires_at > NOW()",
+      [token]
+    );
+
+    if (tokenRows.length === 0) {
+      return sendResponse(res, "success", 200, { active: false }, "Token inactive");
+    }
+
     const decoded = jwt.verify(token, jwtSecret);
 
     return sendResponse(res, "success", 200, {
@@ -206,22 +260,30 @@ app.post("/oauth/introspect", (req, res) => {
       role: decoded.role,
       scope: decoded.scope,
       exp: decoded.exp,
-      iat: decoded.iat
+      iat: decoded.iat,
+      user_id: tokenRows[0].user_id
     }, "Token active");
   } catch (error) {
     return sendResponse(res, "success", 200, { active: false }, "Token inactive");
   }
 });
 
-app.post("/oauth/revoke", (req, res) => {
+app.post("/oauth/revoke", async (req, res) => {
   const token = req.body.token;
 
   if (!token) {
     return sendResponse(res, "error", 400, null, "Token is required");
   }
 
-  revokedTokens.add(token);
-  return sendResponse(res, "success", 200, null, "Token revoked");
+  try {
+    await pool.query(
+      "DELETE FROM shared_oauth_tokens WHERE access_token = ? OR refresh_token = ?",
+      [token, token]
+    );
+    return sendResponse(res, "success", 200, null, "Token revoked");
+  } catch (err) {
+    return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+  }
 });
 
 app.listen(port, () => {
