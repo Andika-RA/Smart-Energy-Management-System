@@ -1,0 +1,207 @@
+[
+    {
+        "id": "1b72ad3e978b41bf",
+        "type": "tab",
+        "label": "Smart City ML Flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "broker_hivemq",
+        "type": "mqtt-broker",
+        "name": "HiveMQ (Wokwi)",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "mqtt_grid_wokwi",
+        "type": "mqtt in",
+        "z": "1b72ad3e978b41bf",
+        "name": "Wokwi: Grid",
+        "topic": "city/+/grid",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "broker_hivemq",
+        "inputs": 0,
+        "x": 130,
+        "y": 120,
+        "wires": [
+            [
+                "func_grid"
+            ]
+        ]
+    },
+    {
+        "id": "func_grid",
+        "type": "function",
+        "z": "1b72ad3e978b41bf",
+        "name": "Enrich Grid Data",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-GRD-\" + Date.now();\n    d.timestamp = new Date().toISOString();\n}\nmsg.payload = d;\nreturn msg;",
+        "outputs": 1,
+        "x": 350,
+        "y": 120,
+        "wires": [
+            [
+                "http_grid"
+            ]
+        ]
+    },
+    {
+        "id": "http_grid",
+        "type": "http request",
+        "z": "1b72ad3e978b41bf",
+        "name": "POST /predict/grid-quality",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://python-ml:5000/predict/grid-quality",
+        "x": 580,
+        "y": 120,
+        "wires": [
+            [
+                "debug_grid"
+            ]
+        ]
+    },
+    {
+        "id": "debug_grid",
+        "type": "debug",
+        "z": "1b72ad3e978b41bf",
+        "name": "API Response (Grid)",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 850,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "mqtt_power_wokwi",
+        "type": "mqtt in",
+        "z": "1b72ad3e978b41bf",
+        "name": "Wokwi: Power",
+        "topic": "city/+/power",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "broker_hivemq",
+        "inputs": 0,
+        "x": 130,
+        "y": 220,
+        "wires": [
+            [
+                "func_power"
+            ]
+        ]
+    },
+    {
+        "id": "func_power",
+        "type": "function",
+        "z": "1b72ad3e978b41bf",
+        "name": "Enrich Power Data",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-PWR-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.hour = now.getHours();\n    let day = now.getDay();\n    d.day_of_week = day === 0 ? 6 : day - 1;\n}\nmsg.payload = d;\nreturn msg;",
+        "outputs": 1,
+        "x": 350,
+        "y": 220,
+        "wires": [
+            [
+                "http_power"
+            ]
+        ]
+    },
+    {
+        "id": "http_power",
+        "type": "http request",
+        "z": "1b72ad3e978b41bf",
+        "name": "POST /predict/power",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://python-ml:5000/predict/power",
+        "x": 570,
+        "y": 220,
+        "wires": [
+            [
+                "debug_power"
+            ]
+        ]
+    },
+    {
+        "id": "debug_power",
+        "type": "debug",
+        "z": "1b72ad3e978b41bf",
+        "name": "API Response (Power)",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 850,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "mqtt_sensor_wokwi",
+        "type": "mqtt in",
+        "z": "1b72ad3e978b41bf",
+        "name": "Wokwi: Sensor",
+        "topic": "city/+/sensor",
+        "qos": "0",
+        "datatype": "json",
+        "broker": "broker_hivemq",
+        "inputs": 0,
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "func_sensor"
+            ]
+        ]
+    },
+    {
+        "id": "func_sensor",
+        "type": "function",
+        "z": "1b72ad3e978b41bf",
+        "name": "Enrich Sensor Data",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-SNS-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.timestamp_hour = now.getHours();\n}\nmsg.payload = d;\nreturn msg;",
+        "outputs": 1,
+        "x": 350,
+        "y": 320,
+        "wires": [
+            [
+                "http_sensor"
+            ]
+        ]
+    },
+    {
+        "id": "http_sensor",
+        "type": "http request",
+        "z": "1b72ad3e978b41bf",
+        "name": "POST /detect/anomaly",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://python-ml:5000/detect/anomaly",
+        "x": 580,
+        "y": 320,
+        "wires": [
+            [
+                "debug_sensor"
+            ]
+        ]
+    },
+    {
+        "id": "debug_sensor",
+        "type": "debug",
+        "z": "1b72ad3e978b41bf",
+        "name": "API Response (Sensor)",
+        "active": true,
+        "console": "false",
+        "complete": "payload",
+        "x": 860,
+        "y": 320,
+        "wires": []
+    }
+]
