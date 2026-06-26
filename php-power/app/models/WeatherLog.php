@@ -1,12 +1,12 @@
 <?php
-// app/models/GridReading.php
+// app/models/WeatherLog.php
 namespace app\models;
 use app\Database;
 use PDO;
 
-class GridReading {
+class WeatherLog {
     private PDO $conn;
-    private string $table_name = "grid_readings";
+    private string $table_name = "power_weather_logs";
 
     public function __construct() {
         $db = new Database();
@@ -15,15 +15,14 @@ class GridReading {
 
     public function create(array $data): array {
         $query = "INSERT INTO " . $this->table_name . "
-                  (zone_id, voltage, current, power_factor, recorded_at)
-                  VALUES (:zone_id, :voltage, :current, :power_factor, :recorded_at)";
+                  (zone_id, temperature, humidity, recorded_at)
+                  VALUES (:zone_id, :temperature, :humidity, :recorded_at)";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':zone_id', $data['zone_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':voltage', $data['voltage']);
-        $stmt->bindParam(':current', $data['current']);
-        $stmt->bindParam(':power_factor', $data['power_factor']);
+        $stmt->bindParam(':temperature', $data['temperature']);
+        $stmt->bindParam(':humidity', $data['humidity']);
         $stmt->bindParam(':recorded_at', $data['recorded_at']);
 
         $stmt->execute();
@@ -58,18 +57,16 @@ class GridReading {
     public function update(int $id, array $data): bool {
         $query = "UPDATE " . $this->table_name . " SET
                   zone_id = :zone_id,
-                  voltage = :voltage,
-                  current = :current,
-                  power_factor = :power_factor,
+                  temperature = :temperature,
+                  humidity = :humidity,
                   recorded_at = :recorded_at
                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':zone_id', $data['zone_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':voltage', $data['voltage']);
-        $stmt->bindParam(':current', $data['current']);
-        $stmt->bindParam(':power_factor', $data['power_factor']);
+        $stmt->bindParam(':temperature', $data['temperature']);
+        $stmt->bindParam(':humidity', $data['humidity']);
         $stmt->bindParam(':recorded_at', $data['recorded_at']);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 

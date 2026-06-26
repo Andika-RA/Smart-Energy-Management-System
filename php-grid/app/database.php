@@ -1,10 +1,11 @@
 <?php
-// app/database.php
+// app/Database.php
 namespace app;
+
 use PDO;
 use PDOException;
 
-class database {
+class Database {
     private ?PDO $connection = null;
 
     public function getConnection(): PDO {
@@ -16,13 +17,13 @@ class database {
 
             try {
                 $this->connection = new PDO(
-                    "mysql:host={$host};dbname={$db_name}", 
-                    $username, 
+                    "mysql:host={$host};dbname={$db_name}",
+                    $username,
                     $password
                 );
                 $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-            } catch(PDOException $exception) {
+            } catch (PDOException $exception) {
                 echo json_encode(["error" => "Connection error: " . $exception->getMessage()]);
                 exit;
             }

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smartcity-config
+  namespace: smartcity-platform
+data:
+  DB_HOST: "mysql-service"
+  DB_NAME: "smartcity"
+  DB_USER: "root"
+  RABBITMQ_HOST: "rabbitmq-service"
+  OAUTH_SERVER_URL: "http://oauth-server:3002"
+  CITIZEN_SERVICE_URL: "http://citizen-service:80"
+  GRID_SERVICE_URL: "http://grid-service:80"
+  POWER_SERVICE_URL: "http://power-service:80"
+  PYTHON_ML_URL: "http://python-ml:5000"

@@ -1,7 +1,7 @@
 <?php
 // app/models/ZoneInfrastructure.php
 namespace app\models;
-use app\database;
+use app\Database;
 use PDO;
 
 class ZoneInfrastructure {
@@ -9,17 +9,17 @@ class ZoneInfrastructure {
     private string $table_name = "shared_zones";
 
     public function __construct() {
-        $db = new database();
+        $db = new Database();
         $this->conn = $db->getConnection();
     }
 
     public function create(array $data): array {
-        $query = "INSERT INTO " . $this->table_name . " 
-                  (name, city_district, max_capacity_ampere, transformer_capacity_kva, nominal_voltage, area_km2, health_status) 
+        $query = "INSERT INTO " . $this->table_name . "
+                  (name, city_district, max_capacity_ampere, transformer_capacity_kva, nominal_voltage, area_km2, health_status)
                   VALUES (:name, :city_district, :max_capacity_ampere, :transformer_capacity_kva, :nominal_voltage, :area_km2, :health_status)";
-        
+
         $stmt = $this->conn->prepare($query);
-        
+
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':city_district', $data['city_district']);
         $stmt->bindParam(':max_capacity_ampere', $data['max_capacity_ampere']);
@@ -27,10 +27,10 @@ class ZoneInfrastructure {
         $stmt->bindParam(':nominal_voltage', $data['nominal_voltage']);
         $stmt->bindParam(':area_km2', $data['area_km2']);
         $stmt->bindParam(':health_status', $data['health_status']);
-        
+
         $stmt->execute();
         $data['id'] = (int)$this->conn->lastInsertId();
-        
+
         return $data;
     }
 
@@ -51,18 +51,18 @@ class ZoneInfrastructure {
     }
 
     public function update(int $id, array $data): bool {
-        $query = "UPDATE " . $this->table_name . " SET 
-                  name = :name, 
-                  city_district = :city_district, 
-                  max_capacity_ampere = :max_capacity_ampere, 
-                  transformer_capacity_kva = :transformer_capacity_kva, 
-                  nominal_voltage = :nominal_voltage, 
-                  area_km2 = :area_km2, 
-                  health_status = :health_status 
+        $query = "UPDATE " . $this->table_name . " SET
+                  name = :name,
+                  city_district = :city_district,
+                  max_capacity_ampere = :max_capacity_ampere,
+                  transformer_capacity_kva = :transformer_capacity_kva,
+                  nominal_voltage = :nominal_voltage,
+                  area_km2 = :area_km2,
+                  health_status = :health_status
                   WHERE id = :id";
-        
+
         $stmt = $this->conn->prepare($query);
-        
+
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':city_district', $data['city_district']);
         $stmt->bindParam(':max_capacity_ampere', $data['max_capacity_ampere']);
@@ -71,7 +71,7 @@ class ZoneInfrastructure {
         $stmt->bindParam(':area_km2', $data['area_km2']);
         $stmt->bindParam(':health_status', $data['health_status']);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        
+
         return $stmt->execute();
     }
 

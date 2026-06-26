@@ -1,7 +1,7 @@
 <?php
 // app/models/GridIncident.php
 namespace app\models;
-use app\database;
+use app\Database;
 use PDO;
 
 class GridIncident {
@@ -9,17 +9,17 @@ class GridIncident {
     private string $table_name = "grid_incidents";
 
     public function __construct() {
-        $db = new database();
+        $db = new Database();
         $this->conn = $db->getConnection();
     }
 
     public function create(array $data): array {
-        $query = "INSERT INTO " . $this->table_name . " 
-                  (zone_id, type, severity, status, description, resolved_at, reported_at) 
+        $query = "INSERT INTO " . $this->table_name . "
+                  (zone_id, type, severity, status, description, resolved_at, reported_at)
                   VALUES (:zone_id, :type, :severity, :status, :description, :resolved_at, :reported_at)";
-        
+
         $stmt = $this->conn->prepare($query);
-        
+
         $stmt->bindParam(':zone_id', $data['zone_id'], PDO::PARAM_INT);
         $stmt->bindParam(':type', $data['type']);
         $stmt->bindParam(':severity', $data['severity']);
@@ -27,10 +27,10 @@ class GridIncident {
         $stmt->bindParam(':description', $data['description']);
         $stmt->bindParam(':resolved_at', $data['resolved_at']);
         $stmt->bindParam(':reported_at', $data['reported_at']);
-        
+
         $stmt->execute();
         $data['id'] = (int)$this->conn->lastInsertId();
-        
+
         return $data;
     }
 
@@ -78,18 +78,18 @@ class GridIncident {
     }
 
     public function update(int $id, array $data): bool {
-        $query = "UPDATE " . $this->table_name . " SET 
-                  zone_id = :zone_id, 
-                  type = :type, 
-                  severity = :severity, 
-                  status = :status, 
-                  description = :description, 
-                  resolved_at = :resolved_at, 
-                  reported_at = :reported_at 
+        $query = "UPDATE " . $this->table_name . " SET
+                  zone_id = :zone_id,
+                  type = :type,
+                  severity = :severity,
+                  status = :status,
+                  description = :description,
+                  resolved_at = :resolved_at,
+                  reported_at = :reported_at
                   WHERE id = :id";
-        
+
         $stmt = $this->conn->prepare($query);
-        
+
         $stmt->bindParam(':zone_id', $data['zone_id'], PDO::PARAM_INT);
         $stmt->bindParam(':type', $data['type']);
         $stmt->bindParam(':severity', $data['severity']);
@@ -98,7 +98,7 @@ class GridIncident {
         $stmt->bindParam(':resolved_at', $data['resolved_at']);
         $stmt->bindParam(':reported_at', $data['reported_at']);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        
+
         return $stmt->execute();
     }
 

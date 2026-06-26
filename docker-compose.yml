@@ -1,24 +1,24 @@
 # docker-compose.yml
-version: "3.9"
-
 networks:
   smartcity-net:
     driver: bridge
+
 volumes:
   mysql-data:
   rabbitmq-data:
   grafana-data:
 
 services:
-
-  # ── INFRA ──────────────────────────────────────────────────────────────────
+  # ── INFRASTRUKTUR UTAMA ──────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
+    container_name: smartcity-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: smartcity
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
     volumes:
       - ./database:/docker-entrypoint-initdb.d 
+      - mysql-data:/var/lib/mysql
     networks:
       - smartcity-net
     healthcheck:
@@ -29,9 +29,10 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.12-management
+    container_name: smartcity-rabbitmq
     ports:
       - "5672:5672"   
-      - "15672:15672" 
+      - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
@@ -39,62 +40,122 @@ services:
   
   mosquitto:
     image: eclipse-mosquitto:2.0
-    ports: ["1883:1883"]
-    volumes: [./iot/mosquitto.conf:/mosquitto/config/mosquitto.conf]
-    networks: [smartcity-net]
+    container_name: smartcity-mosquitto
+    ports: 
+      - "1883:1883"
+    volumes: 
+      - ./iot/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks: 
+      - smartcity-net
  
-  # ── SERVICES ───────────────────────────────────────────────────────────────
+  # ── MICROSERVICES CORE ───────────────────────────────────────────────────
+  oauth-server:
+    build: ./oauth-server
+    container_name: smartcity-oauth
+    ports: ["3002:3002"]
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: 
+      - smartcity-net
+
   api-gateway:
     build: ./express-gateway
-    ports: ["3000:3000"]
+    container_name: smartcity-gateway
+    ports: 
+      - "3000:3000"
     environment:
-      JWT_SECRET: ${JWT_SECRET}
-      CITIZEN_SERVICE_URL: http://citizen-service:8000
-      TRAFFIC_SERVICE_URL: http://traffic-service:8001
-      ENV_SERVICE_URL: http://env-service:8002
-      PYTHON_ML_URL: http://python-ml:5000
-    depends_on: [rabbitmq, mysql]
-    networks: [smartcity-net]
+      - JWT_SECRET=${JWT_SECRET}
+      - OAUTH_SERVER_URL=http://oauth-server:3002
+      - CITIZEN_SERVICE_URL=http://citizen-service:80
+      - GRID_SERVICE_URL=http://grid-service:80
+      - POWER_SERVICE_URL=http://power-service:80
+      - PYTHON_ML_URL=http://python-ml:5000
+    depends_on: 
+      - rabbitmq
+      - oauth-server
+    networks: 
+      - smartcity-net
  
   citizen-service:
     build: ./php-citizen
+    container_name: smartcity-citizen
     ports:
-      - "8000:80" 
+      - "8000:80"
     environment:
-      DB_HOST: mysql
-      DB_NAME: smartcity
-      DB_USER: root
-      DB_PASS: rootpass
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - smartcity-net
   
-  power-service:
-    build: ./php-power
-    environment: {DB_HOST: mysql, RABBITMQ_HOST: rabbitmq}
-    networks: [smartcity-net]
-  
   grid-service:
     build: ./php-grid
-    environment: {DB_HOST: mysql, RABBITMQ_HOST: rabbitmq}
-    networks: [smartcity-net]
+    container_name: smartcity-grid
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: 
+      - smartcity-net
+
+  power-service:
+    build: ./php-power
+    container_name: smartcity-power
+    environment: 
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: 
+      - smartcity-net
  
+  # ── AI & IOT LAYER ───────────────────────────────────────────────────────
   python-ml:
     build: ./python-ml-service
-    environment: {RABBITMQ_HOST: rabbitmq}
-    depends_on: [rabbitmq]
-    networks: [smartcity-net]
+    container_name: smartcity-python-ml
+    ports:
+      - "5000:5000"
+    environment: 
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+    depends_on: 
+      - rabbitmq
+    networks: 
+      - smartcity-net
  
   node-red:
     image: nodered/node-red:3.1
-    ports: ["1880:1880"]
-    volumes: [./iot/node-red-data:/data]
-    networks: [smartcity-net]
+    container_name: smartcity-nodered
+    ports: 
+      - "1880:1880"
+    volumes: 
+      - ./iot/node-red-data:/data
+    networks: 
+      - smartcity-net
 
   iot-simulator:
     build: ./iot
+    container_name: smartcity-iot-monitor
     env_file: .env
     depends_on:
       - mosquitto
@@ -104,12 +165,23 @@ services:
   # ── MONITORING ─────────────────────────────────────────────────────────────
   prometheus:
     image: prom/prometheus:v2.48.0
-    ports: ["9090:9090"]
-    volumes: [./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml]
-    networks: [smartcity-net]
+    container_name: smartcity-prometheus
+    ports: 
+      - "9090:9090" # Wajib Port 9090
+    volumes: 
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks: 
+      - smartcity-net
  
   grafana:
     image: grafana/grafana:10.2.0
-    ports: ["3001:3000"]
-    volumes: [grafana-data:/var/lib/grafana]
-    networks: [smartcity-net]
+    container_name: smartcity-grafana
+    ports: 
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASS}
+    volumes: 
+      - grafana-data:/var/lib/grafana
+    networks: 
+      - smartcity-net

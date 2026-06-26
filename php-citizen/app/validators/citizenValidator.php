@@ -1,7 +1,8 @@
 <?php
+// app/validators/CitizenValidator.php
 namespace app\validators;
 
-class citizenValidator {
+class CitizenValidator {
     public static function validate(array $data): array {
         if (empty($data['nik']) || empty($data['name']) || empty($data['email'])) {
             throw new \Exception("NIK, Nama, dan Email wajib diisi.");

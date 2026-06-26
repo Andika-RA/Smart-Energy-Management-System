@@ -9,9 +9,6 @@ class RabbitMQPublisher {
     public function publish(string $routingKey, array $data): void {
         $host = getenv('RABBITMQ_HOST') ?: 'rabbitmq';
         $port = (int)(getenv('RABBITMQ_PORT') ?: 5672);
-        // BUG FIX: sebelumnya hardcoded 'admin'/'test1234', padahal worker.php (consumer)
-        // terkoneksi ke broker yang sama dengan 'guest'/'guest'. docker-compose tidak pernah
-        // membuat akun 'admin', sehingga publish() lama selalu gagal otentikasi.
         $user = getenv('RABBITMQ_USER') ?: 'guest';
         $pass = getenv('RABBITMQ_PASS') ?: 'guest';
 

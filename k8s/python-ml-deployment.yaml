@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-ml
+  namespace: smartcity-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-ml
+  template:
+    metadata:
+      labels:
+        app: python-ml
+    spec:
+      containers:
+      - name: python-ml
+        image: smart-city-platform-python-ml:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: smartcity-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-ml
+  namespace: smartcity-platform
+spec:
+  selector:
+    app: python-ml
+  ports:
+    - port: 5000
+      targetPort: 5000
+      nodePort: 30500
+  type: NodePort

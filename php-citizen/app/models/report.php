@@ -1,29 +1,31 @@
 <?php
+// app/models/Report.php
 namespace app\models;
-use app\database;
+
+use app\Database;
 use PDO;
 
-class report {
+class Report {
     private PDO $conn;
     private string $table = "citizen_reports";
 
     public function __construct() {
-        $this->conn = (new database())->getConnection();
+        $this->conn = (new Database())->getConnection();
     }
 
     public function create(array $data): array {
         $query = "INSERT INTO {$this->table} (citizen_id, category, description, zone_id, status, created_at) VALUES (?, ?, ?, ?, 'pending', ?)";
         $stmt = $this->conn->prepare($query);
         $createdAt = date('Y-m-d H:i:s');
-        
+
         $stmt->execute([
-            $data['citizen_id'], 
-            $data['category'], 
-            $data['description'], 
-            $data['zone_id'] ?? 1, 
+            $data['citizen_id'],
+            $data['category'],
+            $data['description'],
+            $data['zone_id'] ?? 1,
             $createdAt
         ]);
-        
+
         $data['id'] = $this->conn->lastInsertId();
         $data['status'] = 'pending';
         $data['created_at'] = $createdAt;
@@ -42,7 +44,7 @@ class report {
             $query .= " AND zone_id = ?";
             $params[] = $zone_id;
         }
-        
+
         $query .= " ORDER BY created_at DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute($params);

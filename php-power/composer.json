@@ -1,6 +1,6 @@
 {
-    "name": "smartcity/php-citizen",
-    "description": "Citizen Service - Smart Energy Management System",
+    "name": "smartcity/php-power",
+    "description": "Power Service - Smart Energy Management System",
     "require": {
         "php": ">=8.1",
         "php-amqplib/php-amqplib": "^3.5"

@@ -1,20 +1,23 @@
 <?php
+// app/controllers/CitizenController.php
 namespace app\controllers;
-use app\models\citizen;
-use app\validators\citizenValidator;
 
-class citizenController {
-    private citizen $model;
+use app\models\Citizen;
+use app\validators\CitizenValidator;
+
+class CitizenController {
+    private Citizen $model;
 
     public function __construct() {
-        $this->model = new citizen();
+        $this->model = new Citizen();
     }
 
-   public function store() {
+    // POST /api/citizens
+    public function store() {
         $data = json_decode(file_get_contents("php://input"), true);
-        
+
         try {
-            $validatedData = citizenValidator::validate($data);
+            $validatedData = CitizenValidator::validate($data);
             $validatedData['created_at'] = date('Y-m-d H:i:s');
             $validatedData['role'] = 'resident';
 
@@ -34,4 +37,3 @@ class citizenController {
         sendResponse("success", 200, $citizen, "Data profil warga");
     }
 }
-

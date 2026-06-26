@@ -1,12 +1,6 @@
 <?php
 // public/index.php
-require_once __DIR__ . '/../app/database.php';
-require_once __DIR__ . '/../app/models/ZoneInfrastructure.php';
-require_once __DIR__ . '/../app/models/GridReading.php';
-require_once __DIR__ . '/../app/models/GridIncident.php';
-require_once __DIR__ . '/../app/controllers/ZoneInfrastructureController.php';
-require_once __DIR__ . '/../app/controllers/GridReadingController.php';
-require_once __DIR__ . '/../app/controllers/GridIncidentController.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Handle CORS
 header("Access-Control-Allow-Origin: *");
@@ -59,7 +53,7 @@ $incidentController = new GridIncidentController();
 // Routing
 if ($baseUri === '/health' && $method === 'GET') {
     sendResponse("success", 200, null, "Grid Service is healthy");
-} 
+}
 // Zone Routes
 elseif ($baseUri === '/api/zones' || $baseUri === '/api/zone') {
     if ($method === 'GET') {

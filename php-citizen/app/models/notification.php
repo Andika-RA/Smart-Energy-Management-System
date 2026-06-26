@@ -1,13 +1,15 @@
 <?php
+// app/models/Notification.php
 namespace app\models;
-use app\database;
+
+use app\Database;
 use PDO;
 
-class notification {
+class Notification {
     private PDO $conn;
-    
+
     public function __construct() {
-        $this->conn = (new database())->getConnection();
+        $this->conn = (new Database())->getConnection();
     }
 
     public function findByCitizenId(int $citizenId): array {

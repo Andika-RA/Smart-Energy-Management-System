@@ -1,12 +1,12 @@
 <?php
-// app/models/GridReading.php
+// app/models/PowerDemand.php
 namespace app\models;
 use app\Database;
 use PDO;
 
-class GridReading {
+class PowerDemand {
     private PDO $conn;
-    private string $table_name = "grid_readings";
+    private string $table_name = "power_demands";
 
     public function __construct() {
         $db = new Database();
@@ -15,15 +15,13 @@ class GridReading {
 
     public function create(array $data): array {
         $query = "INSERT INTO " . $this->table_name . "
-                  (zone_id, voltage, current, power_factor, recorded_at)
-                  VALUES (:zone_id, :voltage, :current, :power_factor, :recorded_at)";
+                  (zone_id, power_demand_kw, recorded_at)
+                  VALUES (:zone_id, :power_demand_kw, :recorded_at)";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':zone_id', $data['zone_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':voltage', $data['voltage']);
-        $stmt->bindParam(':current', $data['current']);
-        $stmt->bindParam(':power_factor', $data['power_factor']);
+        $stmt->bindParam(':power_demand_kw', $data['power_demand_kw']);
         $stmt->bindParam(':recorded_at', $data['recorded_at']);
 
         $stmt->execute();
@@ -32,14 +30,37 @@ class GridReading {
         return $data;
     }
 
-    public function getAll(?int $zone_id = null): array {
+    public function getAll(?int $zone_id = null, ?string $from = null, ?string $to = null): array {
+        $query = "SELECT * FROM " . $this->table_name;
+        $conditions = [];
+        $params = [];
+
         if ($zone_id !== null) {
-            $query = "SELECT * FROM " . $this->table_name . " WHERE zone_id = :zone_id ORDER BY recorded_at DESC LIMIT 100";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':zone_id', $zone_id, PDO::PARAM_INT);
-        } else {
-            $query = "SELECT * FROM " . $this->table_name . " ORDER BY recorded_at DESC LIMIT 100";
-            $stmt = $this->conn->prepare($query);
+            $conditions[] = "zone_id = :zone_id";
+            $params[':zone_id'] = $zone_id;
+        }
+        if ($from !== null) {
+            $conditions[] = "recorded_at >= :from";
+            $params[':from'] = $from;
+        }
+        if ($to !== null) {
+            $conditions[] = "recorded_at <= :to";
+            $params[':to'] = $to;
+        }
+
+        if (count($conditions) > 0) {
+            $query .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $query .= " ORDER BY recorded_at DESC LIMIT 100";
+
+        $stmt = $this->conn->prepare($query);
+        foreach ($params as $key => &$val) {
+            if ($key === ':zone_id') {
+                $stmt->bindParam($key, $val, PDO::PARAM_INT);
+            } else {
+                $stmt->bindParam($key, $val);
+            }
         }
 
         $stmt->execute();
@@ -58,18 +79,14 @@ class GridReading {
     public function update(int $id, array $data): bool {
         $query = "UPDATE " . $this->table_name . " SET
                   zone_id = :zone_id,
-                  voltage = :voltage,
-                  current = :current,
-                  power_factor = :power_factor,
+                  power_demand_kw = :power_demand_kw,
                   recorded_at = :recorded_at
                   WHERE id = :id";
 
         $stmt = $this->conn->prepare($query);
 
         $stmt->bindParam(':zone_id', $data['zone_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':voltage', $data['voltage']);
-        $stmt->bindParam(':current', $data['current']);
-        $stmt->bindParam(':power_factor', $data['power_factor']);
+        $stmt->bindParam(':power_demand_kw', $data['power_demand_kw']);
         $stmt->bindParam(':recorded_at', $data['recorded_at']);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 

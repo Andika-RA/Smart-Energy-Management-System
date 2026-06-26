@@ -1,0 +1,119 @@
+# 1. CITIZEN SERVICE
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: citizen-service
+  namespace: smartcity-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: citizen-service
+  template:
+    metadata:
+      labels:
+        app: citizen-service
+    spec:
+      containers:
+      - name: citizen-service
+        image: smart-city-platform-php-citizen:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: smartcity-config
+        - secretRef:
+            name: smartcity-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: citizen-service
+  namespace: smartcity-platform
+spec:
+  selector:
+    app: citizen-service
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# 2. GRID SERVICE
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grid-service
+  namespace: smartcity-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grid-service
+  template:
+    metadata:
+      labels:
+        app: grid-service
+    spec:
+      containers:
+      - name: grid-service
+        image: smart-city-platform-php-grid:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: smartcity-config
+        - secretRef:
+            name: smartcity-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grid-service
+  namespace: smartcity-platform
+spec:
+  selector:
+    app: grid-service
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# 3. POWER SERVICE
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: power-service
+  namespace: smartcity-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: power-service
+  template:
+    metadata:
+      labels:
+        app: power-service
+    spec:
+      containers:
+      - name: power-service
+        image: smart-city-platform-php-power:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: smartcity-config
+        - secretRef:
+            name: smartcity-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: power-service
+  namespace: smartcity-platform
+spec:
+  selector:
+    app: power-service
+  ports:
+    - port: 80
+      targetPort: 80
