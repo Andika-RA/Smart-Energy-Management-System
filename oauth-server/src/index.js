@@ -34,7 +34,7 @@ const revokedTokens = new Set();
 const dbConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "rootpass",
+  password: process.env.DB_PASS !== undefined ? process.env.DB_PASS : "rootpass",
   database: process.env.DB_NAME || "smartcity",
   waitForConnections: true,
   connectionLimit: 10,
