@@ -2,13 +2,13 @@
 
 namespace App\Controllers;
 
-class PowerController
+class ForecastController
 {
     public function index()
     {
         return [
-            "service"=>"Power Service",
-            "status"=>"running"
+            "model" => "Forecast",
+            "status" => "ready"
         ];
     }
 }
