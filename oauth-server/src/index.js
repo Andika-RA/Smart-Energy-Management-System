@@ -160,7 +160,7 @@ app.post("/oauth/token", async (req, res) => {
 
     try {
       const [tokenRows] = await pool.query(
-        "SELECT * FROM shared_oauth_tokens WHERE refresh_token = ? AND refresh_token_expires_at > NOW()",
+        "SELECT * FROM shared_oauth_tokens WHERE refresh_token = ? AND refresh_token_expires_at > UTC_TIMESTAMP()",
         [refresh_token]
       );
 
@@ -244,7 +244,7 @@ app.post("/oauth/introspect", async (req, res) => {
 
   try {
     const [tokenRows] = await pool.query(
-      "SELECT * FROM shared_oauth_tokens WHERE access_token = ? AND expires_at > NOW()",
+      "SELECT * FROM shared_oauth_tokens WHERE access_token = ? AND expires_at > UTC_TIMESTAMP()",
       [token]
     );
 
