@@ -16,8 +16,8 @@ class Citizen {
 
     public function create(array $data): array {
         $query = "INSERT INTO " . $this->table_name . "
-                  (nik, name, email, phone, zone_id, role, created_at)
-                  VALUES (:nik, :name, :email, :phone, :zone_id, :role, :created_at)";
+                  (nik, name, email, password, phone, zone_id, role, created_at)
+                  VALUES (:nik, :name, :email, :password, :phone, :zone_id, :role, :created_at)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -25,6 +25,7 @@ class Citizen {
         $stmt->bindParam(':nik', $data['nik']);
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':email', $data['email']);
+        $stmt->bindParam(':password', $data['password']);
         $stmt->bindParam(':phone', $data['phone']);
         $stmt->bindParam(':zone_id', $data['zone_id']);
         $stmt->bindParam(':role', $data['role']);
@@ -33,6 +34,8 @@ class Citizen {
         $stmt->execute();
         $data['id'] = $this->conn->lastInsertId();
 
+        unset($data['password']);
+        
         return $data;
     }
 

@@ -13,7 +13,12 @@ class Notification {
     }
 
     public function findByCitizenId(int $citizenId): array {
-        $stmt = $this->conn->prepare("SELECT * FROM citizen_notifications WHERE citizen_id = ? ORDER BY created_at DESC");
+        $query = "SELECT * FROM citizen_notifications 
+                  WHERE citizen_id = ? 
+                  OR is_broadcast = TRUE 
+                  OR citizen_id IS NULL 
+                  ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
         $stmt->execute([$citizenId]);
         return $stmt->fetchAll();
     }

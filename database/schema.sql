@@ -87,8 +87,8 @@ CREATE TABLE IF NOT EXISTS citizen_notifications (
 CREATE TABLE IF NOT EXISTS grid_readings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     zone_id INT NOT NULL,
-    voltage FLOAT NOT NULL CHECK (voltage >= 0 AND voltage <= 260),
-    current FLOAT NOT NULL CHECK (current >= 0 AND current <= 500),
+    voltage FLOAT NOT NULL,
+    current FLOAT NOT NULL,
     power_factor FLOAT NOT NULL CHECK (power_factor >= 0 AND power_factor <= 1), 
     recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (zone_id) REFERENCES shared_zones(id)
