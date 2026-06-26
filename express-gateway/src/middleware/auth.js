@@ -1,4 +1,7 @@
 const services = require("../config/services");
+const jwt = require("jsonwebtoken");
+
+const jwtSecret = process.env.JWT_SECRET || "change_this_secret";
 
 function getBearerToken(req) {
   const header = req.headers.authorization || "";
@@ -14,6 +17,17 @@ async function authMiddleware(req, res, next) {
   const token = getBearerToken(req);
 
   if (!token) {
+    return res.status(401).json({
+      status: "error",
+      code: 401,
+      message: "Unauthorized",
+      service: "api-gateway"
+    });
+  }
+
+  try {
+    jwt.verify(token, jwtSecret);
+  } catch (error) {
     return res.status(401).json({
       status: "error",
       code: 401,
@@ -54,4 +68,16 @@ async function authMiddleware(req, res, next) {
   }
 }
 
-module.exports = authMiddleware;
+function adminMiddleware(req, res, next) {
+  if (!req.user || req.user.role !== "admin") {
+    return res.status(403).json({
+      status: "error",
+      code: 403,
+      message: "Forbidden: Access denied. Admin role required.",
+      service: "api-gateway"
+    });
+  }
+  next();
+}
+
+module.exports = { authMiddleware, adminMiddleware };

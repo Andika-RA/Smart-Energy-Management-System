@@ -41,6 +41,16 @@ app.get("/health", async (req, res) => {
 
 registerProxyRoutes(app);
 
+// Fallback JSON 404 handler for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({
+    status: "error",
+    code: 404,
+    message: "Endpoint not found",
+    service: "api-gateway"
+  });
+});
+
 app.listen(port, () => {
   console.log(`API Gateway berjalan pada port ${port}`);
 });

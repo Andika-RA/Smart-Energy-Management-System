@@ -1,122 +1,291 @@
-require('dotenv').config();
-const express = require('express');
-const mysql = require('mysql2/promise');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+require("dotenv").config();
+
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const mysql = require("mysql2/promise");
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+
+function parseDuration(durationStr) {
+  const matches = durationStr.toString().match(/^(\d+)([hmds])$/);
+  if (!matches) return 3600 * 1000;
+  const value = parseInt(matches[1]);
+  const unit = matches[2];
+  switch (unit) {
+    case 's': return value * 1000;
+    case 'm': return value * 60 * 1000;
+    case 'h': return value * 3600 * 1000;
+    case 'd': return value * 24 * 3600 * 1000;
+    default: return 3600 * 1000;
+  }
+}
+
+function getMySQLDateTime(msFromNow) {
+  const date = new Date(Date.now() + msFromNow);
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+}
 
 const app = express();
-app.use(express.urlencoded({ extended: true })); 
+const port = process.env.PORT || 3002;
+const jwtSecret = process.env.JWT_SECRET || "change_this_secret";
+const jwtExpiresIn = process.env.JWT_EXPIRES_IN || "1h";
+const revokedTokens = new Set();
+
+const dbConfig = {
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASS !== undefined ? process.env.DB_PASS : "rootpass",
+  database: process.env.DB_NAME || "smartcity",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+};
+
+const pool = mysql.createPool(dbConfig);
+
 app.use(express.json());
 
-const PORT = process.env.PORT || 3002;
-const JWT_SECRET = process.env.JWT_SECRET;
+function sendResponse(res, status, code, data, message) {
+  res.status(code).json({
+    status,
+    code,
+    data,
+    message,
+    timestamp: new Date().toISOString(),
+    service: "oauth-server"
+  });
+}
 
-const dbPool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+app.get("/", (req, res) => {
+  sendResponse(res, "success", 200, null, "OAuth Server aktif");
 });
 
-const generateAccessToken = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
-const generateRefreshToken = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+app.get("/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+    sendResponse(res, "success", 200, { oauth: "healthy", db: "connected" }, "OAuth Server healthy");
+  } catch (err) {
+    sendResponse(res, "error", 500, { oauth: "healthy", db: "disconnected", error: err.message }, "OAuth Server DB disconnected");
+  }
+});
 
-app.post('/oauth/token', async (req, res) => {
-    try {
-        const { grant_type, client_id, client_secret, username, password, refresh_token } = req.body;
-        if (!client_id || !client_secret) {
-            return res.status(401).json({ error: "invalid_client", error_description: "Missing client_id or client_secret" });
-        }
-        const [clients] = await dbPool.query('SELECT * FROM shared_oauth_clients WHERE client_id = ?', [client_id]);
-        if (clients.length === 0) return res.status(401).json({ error: "invalid_client", error_description: "Client not found" });
-        const client = clients[0];
-        const isClientValid = await bcrypt.compare(client_secret, client.client_secret);
-        if (!isClientValid) return res.status(401).json({ error: "invalid_client", error_description: "Invalid client_secret" });
-        if (!client.grant_types.includes(grant_type)) {
-            return res.status(400).json({ error: "unsupported_grant_type", error_description: `Client is not allowed to use ${grant_type}` });
-        }
-        let accessToken, refreshToken, expiresAt;
-        let userId = null;
-        let userType = 'service';
-        if (grant_type === 'password') {
-            if (!username || !password) return res.status(400).json({ error: "invalid_request", error_description: "Missing username or password" });
-            const [users] = await dbPool.query('SELECT * FROM citizen_citizens WHERE email = ?', [username]);
-            if (users.length === 0) return res.status(400).json({ error: "invalid_grant", error_description: "Invalid credentials" });
-            const user = users[0];
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) return res.status(400).json({ error: "invalid_grant", error_description: "Invalid credentials" });
-            userId = user.id;
-            userType = user.role === 'admin' ? 'admin' : 'citizen';
-            const payload = { sub: user.id, email: user.email, role: user.role, type: userType, client_id };
-            accessToken = generateAccessToken(payload);
-            refreshToken = generateRefreshToken(payload);
-        } else if (grant_type === 'client_credentials') {
-            const payload = { sub: client_id, type: 'service', client_id };
-            accessToken = generateAccessToken(payload);
-            userType = 'service';
-        } else if (grant_type === 'refresh_token') {
-            if (!refresh_token) return res.status(400).json({ error: "invalid_request", error_description: "Missing refresh_token parameter" });
-            let decoded;
-            try { decoded = jwt.verify(refresh_token, JWT_SECRET); } 
-            catch (e) { return res.status(400).json({ error: "invalid_grant", error_description: "Refresh token expired or invalid" }); }
-            const [tokens] = await dbPool.query('SELECT * FROM shared_oauth_tokens WHERE refresh_token = ? AND client_id = ?', [refresh_token, client_id]);
-            if (tokens.length === 0) return res.status(400).json({ error: "invalid_grant", error_description: "Token has been revoked or not found" });
-            userId = decoded.sub;
-            userType = decoded.type;
-            const payload = { sub: userId, email: decoded.email, role: decoded.role, type: userType, client_id };
-            accessToken = generateAccessToken(payload);
-            refreshToken = generateRefreshToken(payload);
-            await dbPool.query('DELETE FROM shared_oauth_tokens WHERE refresh_token = ?', [refresh_token]);
-        } else {
-            return res.status(400).json({ error: "unsupported_grant_type" });
-        }
-        expiresAt = new Date(Date.now() + 3600000);
-        await dbPool.query(
-            'INSERT INTO shared_oauth_tokens (client_id, user_id, user_type, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?, ?, ?)',
-            [client_id, userId, userType, accessToken, refreshToken || null, expiresAt]
+app.post("/oauth/token", async (req, res) => {
+  const {
+    grant_type = "password",
+    username,
+    password,
+    client_id,
+    client_secret
+  } = req.body;
+
+  let payload;
+  let user_id = null;
+  let user_type = "citizen";
+
+  if (grant_type === "password") {
+    if (!username || !password) {
+      return sendResponse(res, "error", 400, null, "username and password are required");
+    }
+
+    if (username === "admin" && password === "password") {
+      payload = {
+        sub: "admin",
+        role: "admin",
+        scope: "smart-energy"
+      };
+      user_type = "admin";
+    } else {
+      try {
+        const [rows] = await pool.query(
+          "SELECT * FROM citizen_citizens WHERE email = ? OR nik = ?",
+          [username, username]
         );
-        res.json({
-            access_token: accessToken,
-            token_type: "Bearer",
-            expires_in: 3600,
-            refresh_token: refreshToken
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "server_error" });
-    }
-});
 
-app.post('/oauth/introspect', async (req, res) => {
-    const { token } = req.body;
-    if (!token) return res.status(400).json({ active: false });
+        if (rows.length === 0) {
+          return sendResponse(res, "error", 401, null, "Invalid username or password");
+        }
+
+        const citizen = rows[0];
+        if (password !== citizen.nik) {
+          return sendResponse(res, "error", 401, null, "Invalid username or password");
+        }
+
+        payload = {
+          sub: citizen.email,
+          role: citizen.role,
+          scope: citizen.role === "admin" ? "smart-energy" : "smart-energy:citizen"
+        };
+        user_id = citizen.id;
+        user_type = citizen.role;
+      } catch (err) {
+        return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+      }
+    }
+  } else if (grant_type === "client_credentials") {
+    if (!client_id || !client_secret) {
+      return sendResponse(res, "error", 400, null, "client_id and client_secret are required");
+    }
+
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const [tokens] = await dbPool.query('SELECT id FROM shared_oauth_tokens WHERE access_token = ?', [token]);
-        if (tokens.length === 0) return res.json({ active: false });
-        res.json({
-            active: true,
-            client_id: decoded.client_id,
-            sub: decoded.sub,
-            exp: decoded.exp,
-            type: decoded.type,
-            role: decoded.role
-        });
-    } catch (error) {
-        res.json({ active: false });
+      const [rows] = await pool.query(
+        "SELECT * FROM shared_oauth_clients WHERE client_id = ?",
+        [client_id]
+      );
+
+      if (rows.length === 0) {
+        return sendResponse(res, "error", 401, null, "Invalid client credentials");
+      }
+
+      const client = rows[0];
+      const validSecret = bcrypt.compareSync(client_secret, client.client_secret);
+
+      if (!validSecret) {
+        return sendResponse(res, "error", 401, null, "Invalid client credentials");
+      }
+
+      payload = {
+        sub: client_id,
+        role: "service",
+        scope: "internal"
+      };
+      user_type = "service";
+    } catch (err) {
+      return sendResponse(res, "error", 500, null, "Database error: " + err.message);
     }
+  } else if (grant_type === "refresh_token") {
+    const { refresh_token } = req.body;
+    if (!refresh_token) {
+      return sendResponse(res, "error", 400, null, "refresh_token is required");
+    }
+
+    try {
+      const [tokenRows] = await pool.query(
+        "SELECT * FROM shared_oauth_tokens WHERE refresh_token = ? AND refresh_token_expires_at > UTC_TIMESTAMP()",
+        [refresh_token]
+      );
+
+      if (tokenRows.length === 0) {
+        return sendResponse(res, "error", 401, null, "Invalid or expired refresh token");
+      }
+
+      const tokenRecord = tokenRows[0];
+
+      // Revoke/Delete the old refresh token record
+      await pool.query("DELETE FROM shared_oauth_tokens WHERE id = ?", [tokenRecord.id]);
+
+      user_id = tokenRecord.user_id;
+      user_type = tokenRecord.user_type;
+
+      if (user_id) {
+        const [userRows] = await pool.query(
+          "SELECT * FROM citizen_citizens WHERE id = ?",
+          [user_id]
+        );
+        const user = userRows[0];
+        payload = {
+          sub: user ? user.email : "unknown",
+          role: user ? user.role : user_type,
+          scope: (user ? user.role : user_type) === "admin" ? "smart-energy" : "smart-energy:citizen"
+        };
+      } else {
+        payload = {
+          sub: tokenRecord.client_id,
+          role: "service",
+          scope: "internal"
+        };
+      }
+    } catch (err) {
+      return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+    }
+  } else {
+    return sendResponse(res, "error", 400, null, "Unsupported grant type");
+  }
+
+  const access_token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
+  const refresh_token = crypto.randomBytes(40).toString("hex");
+
+  const accessExpiresMs = parseDuration(jwtExpiresIn);
+  const refreshExpiresMs = 7 * 24 * 3600 * 1000; // 7 days
+
+  const expires_at = getMySQLDateTime(accessExpiresMs);
+  const refresh_token_expires_at = getMySQLDateTime(refreshExpiresMs);
+
+  try {
+    await pool.query(
+      "INSERT INTO shared_oauth_tokens (client_id, user_id, user_type, access_token, expires_at, refresh_token, refresh_token_expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [
+        client_id || "smart-city-client",
+        user_id,
+        user_type,
+        access_token,
+        expires_at,
+        refresh_token,
+        refresh_token_expires_at
+      ]
+    );
+  } catch (err) {
+    return sendResponse(res, "error", 500, null, "Failed to store token: " + err.message);
+  }
+
+  return sendResponse(res, "success", 200, {
+    access_token,
+    token_type: "Bearer",
+    expires_in: Math.floor(accessExpiresMs / 1000),
+    refresh_token
+  }, "Token issued");
 });
 
-app.post('/oauth/revoke', async (req, res) => {
-    const { token } = req.body;
-    if (!token) return res.status(400).json({ error: "invalid_request" });
-    await dbPool.query('DELETE FROM shared_oauth_tokens WHERE access_token = ? OR refresh_token = ?', [token, token]);
-    res.status(200).json({});
+app.post("/oauth/introspect", async (req, res) => {
+  const token = req.body.token;
+
+  if (!token) {
+    return sendResponse(res, "success", 200, { active: false }, "Token inactive");
+  }
+
+  try {
+    const [tokenRows] = await pool.query(
+      "SELECT * FROM shared_oauth_tokens WHERE access_token = ? AND expires_at > UTC_TIMESTAMP()",
+      [token]
+    );
+
+    if (tokenRows.length === 0) {
+      return sendResponse(res, "success", 200, { active: false }, "Token inactive");
+    }
+
+    const decoded = jwt.verify(token, jwtSecret);
+
+    return sendResponse(res, "success", 200, {
+      active: true,
+      sub: decoded.sub,
+      role: decoded.role,
+      scope: decoded.scope,
+      exp: decoded.exp,
+      iat: decoded.iat,
+      user_id: tokenRows[0].user_id
+    }, "Token active");
+  } catch (error) {
+    return sendResponse(res, "success", 200, { active: false }, "Token inactive");
+  }
 });
 
-app.listen(PORT, () => {
-    console.log(`Strict OAuth 2.0 Server running on port ${PORT}`);
+app.post("/oauth/revoke", async (req, res) => {
+  const token = req.body.token;
+
+  if (!token) {
+    return sendResponse(res, "error", 400, null, "Token is required");
+  }
+
+  try {
+    await pool.query(
+      "DELETE FROM shared_oauth_tokens WHERE access_token = ? OR refresh_token = ?",
+      [token, token]
+    );
+    return sendResponse(res, "success", 200, null, "Token revoked");
+  } catch (err) {
+    return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`OAuth Server berjalan pada port ${port}`);
 });

@@ -132,4 +132,45 @@ INSERT INTO grid_incidents (zone_id, type, severity, status, description) VALUES
 (4, 'Phase Loss', 'high', 'resolved', 'Perbaikan sekring putus selesai.'),
 (5, 'Equipment Failure', 'high', 'open', 'Suhu trafo melebihi batas aman (80 derajat).'),
 (1, 'Harmonics', 'low', 'investigating', 'Pemantauan kualitas daya harian.'),
-(2, 'Brownout', 'medium', 'resolved', 'Gardu telah dise
+(2, 'Brownout', 'medium', 'resolved', 'Gardu telah diseimbangkan.'),
+(3, 'Overload', 'high', 'open', 'Penggunaan AC serentak saat suhu 36 derajat.'),
+(4, 'Short Circuit', 'critical', 'investigating', 'Terdeteksi arus 500A sesaat sebelum trip.');
+
+INSERT INTO power_demands (zone_id, power_demand_kw) VALUES
+(1, 73.5), (2, 8.5), (3, 44.5), (4, 22.0), (5, 40.0),
+(1, 75.2), (2, 9.1), (3, 46.0), (4, 23.5), (5, 42.1),
+(1, 78.0), (2, 10.0), (3, 48.2), (4, 25.0), (5, 45.5),
+(1, 76.5), (2, 9.5), (3, 47.0), (4, 24.0), (5, 43.0);
+
+INSERT INTO power_weather_logs (zone_id, temperature, humidity) VALUES
+(1, 32.5, 65.0), (2, 31.0, 70.0), (3, 33.0, 60.0), (4, 30.5, 75.0), (5, 34.0, 55.0),
+(1, 33.0, 63.0), (2, 31.5, 68.0), (3, 33.5, 58.0), (4, 31.0, 73.0), (5, 34.5, 53.0),
+(1, 34.0, 60.0), (2, 32.5, 65.0), (3, 35.0, 55.0), (4, 32.0, 70.0), (5, 36.0, 50.0),
+(1, 33.5, 62.0), (2, 32.0, 67.0), (3, 34.2, 57.0), (4, 31.5, 72.0), (5, 35.5, 52.0);
+
+INSERT INTO power_forecasts (zone_id, predicted_demand_kw, status_level, forecast_for_time, model_version) VALUES
+(1, 80.5, 'Padat', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(2, 12.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(3, 55.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(4, 28.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(5, 50.0, 'Padat', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+
+(1, 85.0, 'Padat', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(2, 15.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(3, 60.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(4, 30.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(5, 55.0, 'Padat', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+
+(1, 75.0, 'Padat', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(2, 10.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(3, 45.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(4, 25.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(5, 45.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+
+(1, 70.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(2, 8.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(3, 40.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(4, 20.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(5, 40.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0');
+
+SET FOREIGN_KEY_CHECKS = 1;
