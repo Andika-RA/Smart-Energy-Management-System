@@ -1,15 +1,15 @@
 <?php
 // app/models/citizen.php
-namespace App\models;
-use App\database;
+namespace app\models;
+use app\database;
 use PDO;
 
 class citizen {
     private PDO $conn;
-    private string $table_name = "citizen_citizens"; // Prefix sesuai best practice dokumen
+    private string $table_name = "citizen_citizens";
 
     public function __construct() {
-        $db = new Database();
+        $db = new database();
         $this->conn = $db->getConnection();
     }
 
@@ -33,5 +33,11 @@ class citizen {
         $data['id'] = $this->conn->lastInsertId();
         
         return $data;
+    }
+    public function findById(int $id): ?array {
+        $stmt = $this->conn->prepare("SELECT id, nik, name, email, phone, zone_id, role, created_at FROM citizen_citizens WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+        return $result ?: null;
     }
 }

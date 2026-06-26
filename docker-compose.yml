@@ -14,20 +14,28 @@ services:
   # ── INFRA ──────────────────────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
-    environment: {MYSQL_ROOT_PASSWORD: rootpass, MYSQL_DATABASE: smartcity}
-    volumes: [mysql-data:/var/lib/mysql]
-    networks: [smartcity-net]
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: smartcity
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d 
+    networks:
+      - smartcity-net
     healthcheck:
-      test: ["CMD","mysqladmin","ping","-h","localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
- 
+
   rabbitmq:
     image: rabbitmq:3.12-management
-    ports: ["15672:15672"]
-    volumes: [rabbitmq-data:/var/lib/rabbitmq]
-    networks: [smartcity-net]
+    ports:
+      - "5672:5672"   
+      - "15672:15672" 
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - smartcity-net
   
   mosquitto:
     image: eclipse-mosquitto:2.0
@@ -50,9 +58,18 @@ services:
  
   citizen-service:
     build: ./php-citizen
-    environment: {DB_HOST: mysql, DB_NAME: smartcity, RABBITMQ_HOST: rabbitmq}
-    depends_on: {mysql: {condition: service_healthy}}
-    networks: [smartcity-net]
+    ports:
+      - "8000:80" 
+    environment:
+      DB_HOST: mysql
+      DB_NAME: smartcity
+      DB_USER: root
+      DB_PASS: rootpass
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - smartcity-net
   
   power-service:
     build: ./php-power
