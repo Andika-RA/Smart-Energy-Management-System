@@ -22,6 +22,9 @@ const injectUserHeaders = (proxyReq, req, res) => {
 };
 
 function registerProxyRoutes(app) {
+  // OAuth Server Proxy (no auth middleware required for getting / introspecting / revoking tokens)
+  app.use("/oauth", createProxyMiddleware({ target: services.oauth, changeOrigin: true, on: { error: proxyErrorHandler } }));
+
   // Admin-only route: PATCH /api/reports/:id/status
   app.patch(
     "/api/reports/:id/status",
@@ -45,6 +48,8 @@ function registerProxyRoutes(app) {
   
   // Power & Grid Services Proxies
   app.use("/api/power", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/weather", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/forecast", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
   app.use("/api/grid", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
   app.use("/api/zones", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
   app.use("/api/grid-readings", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
