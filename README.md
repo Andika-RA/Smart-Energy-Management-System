@@ -7,7 +7,6 @@ This is the Smart City Integrated Platform, focusing on the **Smart Energy and P
 ## 🗺️ Folder Layout
 
 ```plaintext
-├── .agents/               # Agent metadata and task logs (ignored by git)
 ├── database/              # SQL schemas, seed scripts, and Postman API collection
 │   ├── schema.sql         # Database schema definition
 │   ├── seed.sql           # Database seed data (citizens, readings, client credentials)
