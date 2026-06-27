@@ -1,43 +1,64 @@
-# Smart City Integrated Platform - Architecture Design
+# Desain Arsitektur Sistem — Smart City Integrated Platform
 
-This document details the architecture and data flows for the Smart City Integrated Platform, focusing on the Smart Energy / Power Grid sub-theme.
+Dokumen ini menjelaskan rancangan arsitektur, detail komponen, dan aliran data terintegrasi untuk platform Smart City (sub-tema Smart Energy & Power Grid).
 
-## Component Architecture
+---
 
-The platform is designed as a microservices architecture consisting of an API Gateway, an OAuth 2.0 Authorization Server, three downstream PHP services, a Python ML Service, and an IoT pipeline.
+## Gambaran Arsitektur Keseluruhan
+
+Berikut adalah arsitektur lengkap Smart City Integrated Platform yang diimplementasikan dalam sistem:
+
+| Layer | Komponen | Teknologi | Port | Fungsi |
+| :--- | :--- | :--- | :--- | :--- |
+| **IoT Layer** | Sensor Gateway | Node-RED + Mosquitto MQTT | 1883/1880 | Menerima data sensor dari perangkat IoT (grid), lalu menerbitkannya ke event broker. |
+| **IoT Layer** | IoT Device Simulator | Python / Wokwi ESP32 | - | Mensimulasikan sensor tegangan (voltage), arus (current), dan suhu secara real-time. |
+| **Gateway Layer** | API Gateway | Express.js + http-proxy-middleware | 3060 | Routing, verifikasi token JWT lokal, rate limiting, pembatasan hak akses (RBAC), dan agregasi kesehatan sistem. |
+| **Gateway Layer** | OAuth Server | Express.js + MySQL | 3002 | Menerbitkan, memverifikasi, dan mencabut access token / refresh token OAuth 2.0 secara stateful. |
+| **Service Layer** | Citizen Service | PHP 8.2 MVC + PDO | 8000 | Mengelola CRUD data warga, pelaporan masalah perkotaan, dan pengiriman notifikasi warga. |
+| **Service Layer** | Grid Service | PHP 8.2 MVC + PDO | 8001 | Mengelola data wilayah (zone), kapasitas trafo, pemantauan voltage/current, dan insiden padam. |
+| **Service Layer** | Power Service | PHP 8.2 MVC + PDO | 8002 | Mengelola pencatatan konsumsi daya listrik kota, logs cuaca, dan data prakiraan energi (forecast). |
+| **ML Layer** | Prediction Service | Python 3.11 + FastAPI | 5000 | Menyediakan API prediksi konsumsi daya (regresi), klasifikasi kualitas jaringan, dan deteksi anomali. |
+| **Messaging** | Message Broker | RabbitMQ 3.12 | 5672/15672 | Saluran komunikasi asinkron event-driven antar-layanan (microservices). |
+| **Monitoring** | Metrics & Dashboard | Prometheus + Grafana | 9090/3001 | Pengumpulan metrik performa sistem dan visualisasi dasbor pemantauan. |
+| **Infra** | Container Runtime | Docker + Docker Compose | - | Packaging dan isolasi container untuk semua layanan. |
+| **Infra** | Orchestration | Kubernetes (kubectl) | - | Penyediaan manifest untuk deployment, autoscaling (HPA), dan pemulihan mandiri (self-healing). |
+
+---
+
+## Diagram Komponen Sistem
 
 ```mermaid
 graph TD
-    Client[Client / Web App] -->|HTTPS Requests| Gateway[API Gateway: express-gateway]
-    Gateway -->|1. Authenticate / OAuth| OAuth[OAuth 2.0 Server]
+    Client[Klien / Aplikasi Web] -->|HTTP Requests| Gateway[API Gateway: Port 3060]
+    Gateway -->|1. Autentikasi / Introspeksi| OAuth[OAuth 2.0 Server: Port 3002]
     
-    subgraph Downstream PHP Services
-        Citizen[Citizen Service: php-citizen]
-        Power[Power Service: php-power]
-        Grid[Grid Service: php-grid]
+    subgraph Microservices PHP MVC
+        Citizen[Citizen Service: Port 8000]
+        Power[Power Service: Port 8002]
+        Grid[Grid Service: Port 8001]
     end
     
     Gateway -->|Route: /api/citizens| Citizen
     Gateway -->|Route: /api/power| Power
-    Gateway -->|Route: /api/zones| Grid
+    Gateway -->|Route: /api/grid| Grid
     
     subgraph Machine Learning Service
-        ML[ML Service: python-ml-service]
+        ML[ML Service: Port 5000]
     end
     
     Gateway -->|Route: /predict| ML
+    Gateway -->|Route: /detect| ML
     
-    subgraph IoT & Event Pipeline
-        Wokwi[IoT Device Simulator: Wokwi/ESP32] -->|MQTT| Mosquitto[Mosquitto MQTT Broker]
-        Mosquitto -->|Subscribe| NodeRED[Node-RED Flow Gateway]
-        NodeRED -->|Publish / AMQP| RabbitMQ[RabbitMQ Event Broker]
-        RabbitMQ -->|Consume| PyConsumer[RabbitMQ Energy Consumer]
-        PyConsumer -->|Invoke Predict| ML
-        PyConsumer -->|Store / Post| Power
+    subgraph Pipeline IoT & Event Broker
+        Wokwi[Simulator Sensor ESP32] -->|MQTT| Mosquitto[MQTT Broker: Port 1883]
+        Mosquitto -->|Subscribe| NodeRED[Node-RED Gateway: Port 1880]
+        NodeRED -->|Publish AMQP| RabbitMQ[RabbitMQ: Port 5672]
+        RabbitMQ -->|Consume anomaly.alert| Citizen
+        RabbitMQ -->|Consume grid.new| ML
     end
     
-    subgraph Data Tier
-        DB[(MySQL Database)]
+    subgraph Database Penyimpanan
+        DB[(Database MySQL)]
     end
     
     Citizen -->|PDO| DB
@@ -46,65 +67,36 @@ graph TD
     OAuth -->|SQL| DB
 ```
 
-## System Component Details
+---
 
-1. **API Gateway (`express-gateway/`)**
-   - Serves as the central entry point for all API requests.
-   - Performs JWT signature verification and role-based access control (RBAC).
-   - Implements rate limiting to prevent denial of service.
+## Aliran Data Real-Time (Inbound & Outbound)
 
-2. **OAuth 2.0 Authorization Server (`oauth-server/`)**
-   - Handles client credentials and password grants.
-   - Issues JSON Web Tokens (JWT) for authenticated users/services.
-
-3. **Citizen Downstream Service (`php-citizen/`)**
-   - Manages citizen profiles, complaints/reports, and user notifications.
-   - Interacts with MySQL for user persistence.
-
-4. **Power Downstream Service (`php-power/`)**
-   - Tracks power consumption and forecast demands.
-   - Log weather parameters to calculate correlations.
-
-5. **Grid Downstream Service (`php-grid/`)**
-   - Tracks transformer load, voltages, and currents.
-   - Dispatches incident reports if anomaly thresholds are exceeded.
-
-6. **Python ML Service (`python-ml-service/`)**
-   - Runs model inference for Power Demand (regression), Grid Quality (classification), and Anomaly Detection (Isolation Forest).
-   - Integrates with RabbitMQ consumer to process real-time sensor streams.
-
-7. **IoT Pipeline (`iot/`)**
-   - Uses Wokwi to simulate physical sensors (current, voltage, temperature) on an ESP32.
-   - Connects to Mosquitto and utilizes Node-RED to translate MQTT messages into RabbitMQ AMQP events.
-
-## Real-Time Data Flow (IoT Anomaly & Prediction)
-
-The diagram below details the sequence of events from sensor reading to database storage and ML prediction.
+Diagram urutan di bawah ini menjelaskan alur data sensor dari perangkat fisik IoT hingga masuk ke database dan dianalisis oleh model Machine Learning secara otomatis:
 
 ```mermaid
 sequenceDiagram
     participant ESP32 as IoT ESP32 (Wokwi)
-    participant MQTT as Mosquitto Broker
+    participant MQTT as Mosquitto MQTT Broker
     participant NR as Node-RED Flow
     participant RMQ as RabbitMQ Queue
-    participant Consumer as PyConsumer (Python)
+    participant Consumer as ML Consumer (Python)
     participant ML as ML Service (FastAPI)
     participant DB as MySQL DB
     
-    loop Every 5s
-        ESP32->>MQTT: Publish sensor metrics (voltage, current, temp)
-        MQTT-->>NR: Forward MQTT payload
-        NR->>RMQ: Translate & Publish AMQP Event (grid.sensor)
+    loop Setiap 5 Detik
+        ESP32->>MQTT: Publish data sensor (voltage, current, temperature)
+        MQTT-->>NR: Meneruskan payload MQTT
+        NR->>RMQ: Menerjemahkan & Publish Event AMQP (grid.new)
     end
     
-    Consumer->>RMQ: Listen / Dequeue message
+    Consumer->>RMQ: Mengambil pesan dari antrean (dequeue)
     Consumer->>ML: POST /predict/grid-quality & /detect/anomaly
-    ML-->>Consumer: Return classification & anomaly score
+    ML-->>Consumer: Mengembalikan klasifikasi & skor anomali
     
-    alt Anomaly Detected
-        Consumer->>DB: Log Grid Incident (Critical/High)
-        Consumer->>RMQ: Publish alarm notification (citizen.notif)
-    else Normal Operation
-        Consumer->>DB: Log grid reading metrics
+    alt Terdeteksi Anomali
+        Consumer->>DB: Simpan data gangguan ke tabel grid_incidents
+        Consumer->>RMQ: Kirim notifikasi alarm ke warga (anomaly.alert)
+    else Kondisi Normal
+        Consumer->>DB: Simpan pembacaan sensor ke tabel grid_readings
     end
 ```
