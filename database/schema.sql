@@ -31,9 +31,10 @@ CREATE TABLE IF NOT EXISTS shared_oauth_tokens (
     client_id VARCHAR(100) NOT NULL,
     user_id INT NULL,
     user_type ENUM('citizen', 'admin', 'service') DEFAULT 'citizen',
-    access_token VARCHAR(255) UNIQUE NOT NULL,
-    refresh_token VARCHAR(255) UNIQUE NULL,
+    access_token VARCHAR(512) UNIQUE NOT NULL,
+    refresh_token VARCHAR(512) UNIQUE NULL,
     expires_at DATETIME NOT NULL,
+    refresh_token_expires_at DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -130,7 +131,7 @@ CREATE TABLE IF NOT EXISTS power_forecasts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     zone_id INT NOT NULL,
     predicted_demand_kw FLOAT NOT NULL,
-    status_level ENUM('Lancar', 'Sedang', 'Padat') NOT NULL,
+    status_level ENUM('Normal', 'Tinggi', 'Puncak') NOT NULL,
     forecast_for_time TIMESTAMP NOT NULL,
     model_version VARCHAR(50) NOT NULL DEFAULT 'RandomForest_v1.0',
     generated_from TIMESTAMP NULL,

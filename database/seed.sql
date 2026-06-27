@@ -27,7 +27,8 @@ INSERT INTO shared_oauth_clients (client_id, client_secret, grant_types, redirec
 ('iot_gateway', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'client_credentials', NULL);
 
 INSERT INTO citizen_citizens (nik, name, email, password, phone, zone_id, role) VALUES
-('3171234567890001', 'Rafly Dzakki', 'admin@smartcity.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '08111222333', 1, 'admin'),
+('3171234567890000', 'Rafly Dzakki', 'admin1@smartcity.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '08111222333', 1, 'admin'),
+('3171234567890001', 'Andika Rafa', 'admin2@smartcity.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '08111222333', 1, 'admin'),
 ('3171234567890002', 'Budi Santoso', 'budi@warga.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '081234567002', 2, 'resident'),
 ('3171234567890003', 'Siti Aminah', 'siti@warga.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '081234567003', 3, 'resident'),
 ('3171234567890004', 'Agus Setiawan', 'agus@warga.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', '081234567004', 4, 'resident'),
@@ -149,28 +150,28 @@ INSERT INTO power_weather_logs (zone_id, temperature, humidity) VALUES
 (1, 33.5, 62.0), (2, 32.0, 67.0), (3, 34.2, 57.0), (4, 31.5, 72.0), (5, 35.5, 52.0);
 
 INSERT INTO power_forecasts (zone_id, predicted_demand_kw, status_level, forecast_for_time, model_version) VALUES
-(1, 80.5, 'Padat', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
-(2, 12.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
-(3, 55.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
-(4, 28.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
-(5, 50.0, 'Padat', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(1, 80.5, 'Puncak', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(2, 12.0, 'Normal', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(3, 55.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(4, 28.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
+(5, 50.0, 'Puncak', DATE_ADD(NOW(), INTERVAL 1 HOUR), 'RandomForest_v1.0'),
 
-(1, 85.0, 'Padat', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
-(2, 15.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
-(3, 60.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
-(4, 30.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
-(5, 55.0, 'Padat', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(1, 85.0, 'Puncak', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(2, 15.0, 'Normal', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(3, 60.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(4, 30.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
+(5, 55.0, 'Puncak', DATE_ADD(NOW(), INTERVAL 2 HOUR), 'RandomForest_v1.0'),
 
-(1, 75.0, 'Padat', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
-(2, 10.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
-(3, 45.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
-(4, 25.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
-(5, 45.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(1, 75.0, 'Puncak', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(2, 10.0, 'Normal', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(3, 45.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(4, 25.0, 'Normal', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
+(5, 45.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 3 HOUR), 'RandomForest_v1.0'),
 
-(1, 70.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
-(2, 8.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
-(3, 40.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
-(4, 20.0, 'Lancar', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
-(5, 40.0, 'Sedang', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0');
+(1, 70.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(2, 8.0, 'Normal', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(3, 40.0, 'Normal', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(4, 20.0, 'Normal', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0'),
+(5, 40.0, 'Tinggi', DATE_ADD(NOW(), INTERVAL 4 HOUR), 'RandomForest_v1.0');
 
 SET FOREIGN_KEY_CHECKS = 1;
