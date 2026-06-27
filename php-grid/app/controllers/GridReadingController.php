@@ -63,7 +63,7 @@ class GridReadingController {
         }
 
         try {
-            $record = $this->model->create($data);\
+            $record = $this->model->create($data);
 
             $publisher = new RabbitMQPublisher();
             $publisher->publish('grid.new', $record);

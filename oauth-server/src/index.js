@@ -204,7 +204,7 @@ app.post("/oauth/token", async (req, res) => {
   const refresh_token = crypto.randomBytes(40).toString("hex");
 
   const accessExpiresMs = parseDuration(jwtExpiresIn);
-  const refreshExpiresMs = 7 * 24 * 3600 * 1000; // 7 days
+  const refreshExpiresMs = 7 * 24 * 3600 * 1000;
 
   const expires_at = getMySQLDateTime(accessExpiresMs);
   const refresh_token_expires_at = getMySQLDateTime(refreshExpiresMs);

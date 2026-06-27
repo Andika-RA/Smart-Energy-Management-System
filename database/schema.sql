@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS shared_oauth_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     client_id VARCHAR(100) NOT NULL,
     user_id INT NULL,
-    user_type ENUM('citizen', 'admin', 'service') DEFAULT 'citizen',
+    user_type ENUM('resident', 'admin', 'service') DEFAULT 'resident',
     access_token VARCHAR(512) UNIQUE NOT NULL,
     refresh_token VARCHAR(512) UNIQUE NULL,
     expires_at DATETIME NOT NULL,

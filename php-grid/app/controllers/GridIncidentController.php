@@ -39,12 +39,10 @@ class GridIncidentController {
     public function store() {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        // Validation for required fields
         if (!isset($data['zone_id']) || empty($data['type']) || empty($data['severity']) || empty($data['description'])) {
             sendResponse("error", 400, null, "Data tidak lengkap. Field 'zone_id', 'type', 'severity', dan 'description' wajib diisi");
         }
 
-        // Validate enums (Fix 10)
         if (!in_array($data['severity'], ['low', 'medium', 'high', 'critical'])) {
             sendResponse("error", 400, null, "Nilai 'severity' tidak valid. Harus salah satu dari: 'low', 'medium', 'high', 'critical'");
         }
@@ -54,7 +52,6 @@ class GridIncidentController {
             sendResponse("error", 400, null, "Nilai 'status' tidak valid. Harus salah satu dari: 'open', 'investigating', 'resolved'");
         }
 
-        // Validate zone exists
         $zone = $this->zoneModel->getById((int)$data['zone_id']);
         if ($zone === null) {
             sendResponse("error", 400, null, "Gagal menyimpan data: Zone ID {$data['zone_id']} tidak ditemukan");
@@ -64,7 +61,6 @@ class GridIncidentController {
             $data['reported_at'] = date('Y-m-d H:i:s');
         }
 
-        // Auto resolved_at logic
         if ($data['status'] === 'resolved') {
             $data['resolved_at'] = isset($data['resolved_at']) ? $data['resolved_at'] : date('Y-m-d H:i:s');
         } else {
@@ -89,7 +85,6 @@ class GridIncidentController {
             $input = json_decode(file_get_contents("php://input"), true);
             $data = array_merge($existing, $input);
 
-            // Validate enums (Fix 10)
             if (!in_array($data['severity'], ['low', 'medium', 'high', 'critical'])) {
                 sendResponse("error", 400, null, "Nilai 'severity' tidak valid. Harus salah satu dari: 'low', 'medium', 'high', 'critical'");
             }
@@ -97,13 +92,11 @@ class GridIncidentController {
                 sendResponse("error", 400, null, "Nilai 'status' tidak valid. Harus salah satu dari: 'open', 'investigating', 'resolved'");
             }
 
-            // Validate zone exists
             $zone = $this->zoneModel->getById((int)$data['zone_id']);
             if ($zone === null) {
                 sendResponse("error", 400, null, "Gagal menyimpan data: Zone ID {$data['zone_id']} tidak ditemukan");
             }
 
-            // Auto-populate resolved_at if status changed to resolved
             if ($data['status'] === 'resolved') {
                 $data['resolved_at'] = ($existing['status'] !== 'resolved') ? date('Y-m-d H:i:s') : $data['resolved_at'];
             } else {

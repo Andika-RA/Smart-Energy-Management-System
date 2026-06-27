@@ -42,7 +42,6 @@ class ZoneInfrastructureController {
             sendResponse("error", 400, null, "Field 'max_capacity_ampere' harus berupa angka");
         }
 
-        // Default values & validation
         $data['transformer_capacity_kva'] = isset($data['transformer_capacity_kva']) ? (float)$data['transformer_capacity_kva'] : 0.0;
         $data['nominal_voltage'] = isset($data['nominal_voltage']) ? (float)$data['nominal_voltage'] : 220.0;
         $data['area_km2'] = isset($data['area_km2']) ? (float)$data['area_km2'] : null;
@@ -69,7 +68,6 @@ class ZoneInfrastructureController {
 
             $input = json_decode(file_get_contents("php://input"), true);
 
-            // Merge with existing data
             $data = array_merge($existing, $input);
 
             if (empty($data['name']) || empty($data['city_district']) || !isset($data['max_capacity_ampere'])) {
