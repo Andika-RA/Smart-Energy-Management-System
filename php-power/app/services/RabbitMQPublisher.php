@@ -28,8 +28,6 @@ class RabbitMQPublisher {
             $channel->close();
             $connection->close();
         } catch (\Throwable $e) {
-            // \Throwable (bukan hanya \Exception) supaya kegagalan publish (mis. koneksi
-            // putus, atau library belum ter-load) tidak ikut menggagalkan response API utama.
             error_log("RabbitMQ Error: " . $e->getMessage());
         }
     }

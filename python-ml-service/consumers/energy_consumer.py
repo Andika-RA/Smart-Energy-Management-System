@@ -17,7 +17,8 @@ def start_consumer():
         b_anomaly = bundle['anomaly']
         ch.exchange_declare(exchange='city.events', exchange_type='topic', durable=True)
         ch.queue_declare(queue='energy.new', durable=True)
-        ch.queue_bind(queue='energy.new', exchange='city.events', routing_key='energy.new')
+        ch.queue_bind(queue='energy.new', exchange='city.events', routing_key='grid.new')
+        ch.queue_bind(queue='energy.new', exchange='city.events', routing_key='power.new')
         ch.queue_declare(queue='anomaly.alert', durable=True)
         ch.queue_bind(queue='anomaly.alert', exchange='city.events', routing_key='anomaly.alert')
 
@@ -25,12 +26,19 @@ def start_consumer():
             try:
                 event = json.loads(body)
                 event_id = event.get('id', 'unknown-id')
-                event_timestamp = event.get('timestamp', datetime.utcnow().isoformat() + "Z")
-                sensor_val = event.get('sensor_value', 0)
-                hour = event.get('timestamp_hour', 0)
+                raw_time = event.get('recorded_at') or event.get('timestamp') or datetime.utcnow().isoformat() + "Z"
+                event_timestamp = str(raw_time)
+                sensor_val = float(event.get('voltage') or event.get('power_demand_kw') or event.get('sensor_value', 0))
+                zone = str(event.get('zone_id') or event.get('zone', 'unknown'))
+                try:
+                    if ' ' in event_timestamp:
+                        hour = int(event_timestamp.split(' ')[1].split(':')[0])
+                    else:
+                        hour = int(event.get('timestamp_hour', datetime.utcnow().hour))
+                except:
+                    hour = datetime.utcnow().hour
                 rolling_mean = event.get('rolling_mean_1h', sensor_val)
                 z_score = event.get('z_score', 0)
-                zone = event.get('zone', 'unknown')
                 X = b_anomaly['scaler'].transform([[sensor_val, hour, rolling_mean, z_score]])
                 score = float(b_anomaly['model'].score_samples(X)[0])
                 is_anom = score < -0.1
@@ -40,11 +48,12 @@ def start_consumer():
                     alert_payload = {
                         "id": event_id,
                         "timestamp": event_timestamp,
-                        "zone": zone,
+                        "zone_id": zone,
                         "alert_type": "ENERGY_SPIKE",
                         "severity": "Kritis" if score < -0.3 else "Peringatan",
                         "sensor_value": sensor_val,
-                        "message": f"Terdeteksi anomali tegangan/arus di {zone}"
+                        "anomaly_score": round(-score, 2),
+                        "message": f"Terdeteksi anomali pada sensor (Nilai: {sensor_val}) di Zona {zone}"
                     }
                     ch.basic_publish(
                         exchange='city.events',
@@ -57,7 +66,7 @@ def start_consumer():
                 print(f"[Error] Gagal memproses event: {e}")
                 ch.basic_reject(delivery_tag=method.delivery_tag, requeue=False)
         ch.basic_consume(queue='energy.new', on_message_callback=callback)
-        print("[*] ML Consumer listening on queue 'energy.new'...")
+        print("[*] ML Consumer listening on queue 'energy.new' untuk rute grid.new & power.new...")
         ch.start_consuming()
     except Exception as e:
         print(f"[Fatal] Gagal terhubung ke RabbitMQ: {e}")

@@ -103,6 +103,8 @@ services:
   grid-service:
     build: ./php-grid
     container_name: smartcity-grid
+    ports:
+      - "8001:80"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
@@ -118,6 +120,8 @@ services:
   power-service:
     build: ./php-power
     container_name: smartcity-power
+    ports:
+      - "8002:80"
     environment: 
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}

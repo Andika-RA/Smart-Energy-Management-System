@@ -3,6 +3,7 @@
 namespace app\controllers;
 use app\models\GridReading;
 use app\models\ZoneInfrastructure;
+use app\services\RabbitMQPublisher;
 
 class GridReadingController {
     private GridReading $model;
@@ -38,12 +39,10 @@ class GridReadingController {
     public function store() {
         $data = json_decode(file_get_contents("php://input"), true);
 
-        // Validation for required fields
         if (!isset($data['zone_id']) || !isset($data['voltage']) || !isset($data['current']) || !isset($data['power_factor'])) {
             sendResponse("error", 400, null, "Data tidak lengkap. Field 'zone_id', 'voltage', 'current', dan 'power_factor' wajib diisi");
         }
 
-        // Validate range limits (Fix 8)
         if ($data['voltage'] < 0 || $data['voltage'] > 260) {
             sendResponse("error", 400, null, "Gagal menyimpan data: Batas tegangan (voltage) harus di antara 0 sampai 260 V");
         }
@@ -54,7 +53,6 @@ class GridReadingController {
             sendResponse("error", 400, null, "Gagal menyimpan data: Batas faktor daya (power_factor) harus di antara 0.0 sampai 1.0");
         }
 
-        // Validate zone exists
         $zone = $this->zoneModel->getById((int)$data['zone_id']);
         if ($zone === null) {
             sendResponse("error", 400, null, "Gagal menyimpan data: Zone ID {$data['zone_id']} tidak ditemukan");
@@ -65,7 +63,11 @@ class GridReadingController {
         }
 
         try {
-            $record = $this->model->create($data);
+            $record = $this->model->create($data);\
+
+            $publisher = new RabbitMQPublisher();
+            $publisher->publish('grid.new', $record);
+
             sendResponse("success", 201, $record, "Data grid reading berhasil disimpan");
         } catch (\Exception $e) {
             sendResponse("error", 500, null, "Gagal menyimpan data: " . $e->getMessage());
@@ -82,7 +84,6 @@ class GridReadingController {
             $input = json_decode(file_get_contents("php://input"), true);
             $data = array_merge($existing, $input);
 
-            // Validate range limits (Fix 8)
             if ($data['voltage'] < 0 || $data['voltage'] > 260) {
                 sendResponse("error", 400, null, "Gagal menyimpan data: Batas tegangan (voltage) harus di antara 0 sampai 260 V");
             }
@@ -93,7 +94,6 @@ class GridReadingController {
                 sendResponse("error", 400, null, "Gagal menyimpan data: Batas faktor daya (power_factor) harus di antara 0.0 sampai 1.0");
             }
 
-            // Validate zone exists
             $zone = $this->zoneModel->getById((int)$data['zone_id']);
             if ($zone === null) {
                 sendResponse("error", 400, null, "Gagal menyimpan data: Zone ID {$data['zone_id']} tidak ditemukan");

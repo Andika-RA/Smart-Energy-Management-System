@@ -10,7 +10,7 @@
     {
         "id": "broker_hivemq",
         "type": "mqtt-broker",
-        "name": "HiveMQ (Wokwi)",
+        "name": "HiveMQ (Wokwi Publik)",
         "broker": "broker.hivemq.com",
         "port": "1883",
         "clientid": "",
@@ -28,40 +28,72 @@
         "datatype": "json",
         "broker": "broker_hivemq",
         "inputs": 0,
-        "x": 130,
-        "y": 120,
+        "x": 100,
+        "y": 100,
         "wires": [
             [
-                "func_grid"
+                "func_grid_prep"
             ]
         ]
     },
     {
-        "id": "func_grid",
+        "id": "func_grid_prep",
         "type": "function",
         "z": "1b72ad3e978b41bf",
-        "name": "Enrich Grid Data",
-        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-GRD-\" + Date.now();\n    d.timestamp = new Date().toISOString();\n}\nmsg.payload = d;\nreturn msg;",
+        "name": "Prep Grid & Req Token",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-GRD-\" + Date.now();\n    d.timestamp = new Date().toISOString();\n}\n// Tahan data sensor sementara di variabel lain\nmsg.sensor_data = d;\n\n// Siapkan payload untuk minta token M2M\nmsg.payload = \"grant_type=client_credentials&client_id=iot_gateway&client_secret=password\";\nmsg.headers = {\n    \"Content-Type\": \"application/x-www-form-urlencoded\"\n};\nreturn msg;",
         "outputs": 1,
-        "x": 350,
-        "y": 120,
+        "x": 300,
+        "y": 100,
         "wires": [
             [
-                "http_grid"
+                "http_grid_token"
             ]
         ]
     },
     {
-        "id": "http_grid",
+        "id": "http_grid_token",
         "type": "http request",
         "z": "1b72ad3e978b41bf",
-        "name": "POST /predict/grid-quality",
+        "name": "POST /oauth/token",
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://python-ml:5000/predict/grid-quality",
-        "x": 580,
-        "y": 120,
+        "url": "http://api-gateway:3000/oauth/token",
+        "x": 520,
+        "y": 100,
+        "wires": [
+            [
+                "func_grid_auth"
+            ]
+        ]
+    },
+    {
+        "id": "func_grid_auth",
+        "type": "function",
+        "z": "1b72ad3e978b41bf",
+        "name": "Set Auth & Restore Data",
+        "func": "if (msg.payload && msg.payload.access_token) {\n    msg.headers = {\n        \"Authorization\": \"Bearer \" + msg.payload.access_token,\n        \"Content-Type\": \"application/json\"\n    };\n    // Kembalikan data sensor ke payload utama untuk dikirim\n    msg.payload = msg.sensor_data;\n    return msg;\n} else {\n    node.error(\"Gagal mendapatkan token\", msg);\n    return null;\n}",
+        "outputs": 1,
+        "x": 750,
+        "y": 100,
+        "wires": [
+            [
+                "http_grid_data"
+            ]
+        ]
+    },
+    {
+        "id": "http_grid_data",
+        "type": "http request",
+        "z": "1b72ad3e978b41bf",
+        "name": "POST /api/grid-readings",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-gateway:3000/api/grid-readings",
+        "x": 1000,
+        "y": 100,
         "wires": [
             [
                 "debug_grid"
@@ -76,8 +108,8 @@
         "active": true,
         "console": "false",
         "complete": "payload",
-        "x": 850,
-        "y": 120,
+        "x": 1220,
+        "y": 100,
         "wires": []
     },
     {
@@ -90,40 +122,72 @@
         "datatype": "json",
         "broker": "broker_hivemq",
         "inputs": 0,
-        "x": 130,
-        "y": 220,
+        "x": 100,
+        "y": 200,
         "wires": [
             [
-                "func_power"
+                "func_power_prep"
             ]
         ]
     },
     {
-        "id": "func_power",
+        "id": "func_power_prep",
         "type": "function",
         "z": "1b72ad3e978b41bf",
-        "name": "Enrich Power Data",
-        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-PWR-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.hour = now.getHours();\n    let day = now.getDay();\n    d.day_of_week = day === 0 ? 6 : day - 1;\n}\nmsg.payload = d;\nreturn msg;",
+        "name": "Prep Power & Req Token",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-PWR-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.hour = now.getHours();\n    let day = now.getDay();\n    d.day_of_week = day === 0 ? 6 : day - 1;\n}\nmsg.sensor_data = d;\nmsg.payload = \"grant_type=client_credentials&client_id=iot_gateway&client_secret=password\";\nmsg.headers = {\n    \"Content-Type\": \"application/x-www-form-urlencoded\"\n};\nreturn msg;",
         "outputs": 1,
-        "x": 350,
-        "y": 220,
+        "x": 310,
+        "y": 200,
         "wires": [
             [
-                "http_power"
+                "http_power_token"
             ]
         ]
     },
     {
-        "id": "http_power",
+        "id": "http_power_token",
         "type": "http request",
         "z": "1b72ad3e978b41bf",
-        "name": "POST /predict/power",
+        "name": "POST /oauth/token",
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://python-ml:5000/predict/power",
-        "x": 570,
-        "y": 220,
+        "url": "http://api-gateway:3000/oauth/token",
+        "x": 520,
+        "y": 200,
+        "wires": [
+            [
+                "func_power_auth"
+            ]
+        ]
+    },
+    {
+        "id": "func_power_auth",
+        "type": "function",
+        "z": "1b72ad3e978b41bf",
+        "name": "Set Auth & Restore Data",
+        "func": "if (msg.payload && msg.payload.access_token) {\n    msg.headers = {\n        \"Authorization\": \"Bearer \" + msg.payload.access_token,\n        \"Content-Type\": \"application/json\"\n    };\n    msg.payload = msg.sensor_data;\n    return msg;\n} else {\n    node.error(\"Gagal mendapatkan token\", msg);\n    return null;\n}",
+        "outputs": 1,
+        "x": 750,
+        "y": 200,
+        "wires": [
+            [
+                "http_power_data"
+            ]
+        ]
+    },
+    {
+        "id": "http_power_data",
+        "type": "http request",
+        "z": "1b72ad3e978b41bf",
+        "name": "POST /api/power",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-gateway:3000/api/power",
+        "x": 980,
+        "y": 200,
         "wires": [
             [
                 "debug_power"
@@ -138,8 +202,8 @@
         "active": true,
         "console": "false",
         "complete": "payload",
-        "x": 850,
-        "y": 220,
+        "x": 1220,
+        "y": 200,
         "wires": []
     },
     {
@@ -152,40 +216,72 @@
         "datatype": "json",
         "broker": "broker_hivemq",
         "inputs": 0,
-        "x": 130,
-        "y": 320,
+        "x": 100,
+        "y": 300,
         "wires": [
             [
-                "func_sensor"
+                "func_sensor_prep"
             ]
         ]
     },
     {
-        "id": "func_sensor",
+        "id": "func_sensor_prep",
         "type": "function",
         "z": "1b72ad3e978b41bf",
-        "name": "Enrich Sensor Data",
-        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-SNS-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.timestamp_hour = now.getHours();\n}\nmsg.payload = d;\nreturn msg;",
+        "name": "Prep Sensor & Req Token",
+        "func": "let d = msg.payload;\nif (!d.id) {\n    d.id = \"WKW-SNS-\" + Date.now();\n    let now = new Date();\n    d.timestamp = now.toISOString();\n    d.timestamp_hour = now.getHours();\n}\nmsg.sensor_data = d;\nmsg.payload = \"grant_type=client_credentials&client_id=iot_gateway&client_secret=password\";\nmsg.headers = {\n    \"Content-Type\": \"application/x-www-form-urlencoded\"\n};\nreturn msg;",
         "outputs": 1,
-        "x": 350,
-        "y": 320,
+        "x": 310,
+        "y": 300,
         "wires": [
             [
-                "http_sensor"
+                "http_sensor_token"
             ]
         ]
     },
     {
-        "id": "http_sensor",
+        "id": "http_sensor_token",
+        "type": "http request",
+        "z": "1b72ad3e978b41bf",
+        "name": "POST /oauth/token",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-gateway:3000/oauth/token",
+        "x": 520,
+        "y": 300,
+        "wires": [
+            [
+                "func_sensor_auth"
+            ]
+        ]
+    },
+    {
+        "id": "func_sensor_auth",
+        "type": "function",
+        "z": "1b72ad3e978b41bf",
+        "name": "Set Auth & Restore Data",
+        "func": "if (msg.payload && msg.payload.access_token) {\n    msg.headers = {\n        \"Authorization\": \"Bearer \" + msg.payload.access_token,\n        \"Content-Type\": \"application/json\"\n    };\n    msg.payload = msg.sensor_data;\n    return msg;\n} else {\n    node.error(\"Gagal mendapatkan token\", msg);\n    return null;\n}",
+        "outputs": 1,
+        "x": 750,
+        "y": 300,
+        "wires": [
+            [
+                "http_sensor_data"
+            ]
+        ]
+    },
+    {
+        "id": "http_sensor_data",
         "type": "http request",
         "z": "1b72ad3e978b41bf",
         "name": "POST /detect/anomaly",
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://python-ml:5000/detect/anomaly",
-        "x": 580,
-        "y": 320,
+        "url": "http://api-gateway:3000/detect/anomaly",
+        "x": 990,
+        "y": 300,
         "wires": [
             [
                 "debug_sensor"
@@ -200,8 +296,8 @@
         "active": true,
         "console": "false",
         "complete": "payload",
-        "x": 860,
-        "y": 320,
+        "x": 1220,
+        "y": 300,
         "wires": []
     }
 ]

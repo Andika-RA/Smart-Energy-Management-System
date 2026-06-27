@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\PowerDemand;
 use app\models\ZoneInfrastructure;
 use app\services\RabbitMQPublisher;
+use app\services\RabbitMQPublisher;
 
 class PowerController {
     private PowerDemand $model;
@@ -67,9 +68,8 @@ class PowerController {
         try {
             $record = $this->model->create($data);
 
-            // Jika konsumsi melebihi kapasitas trafo zona, publish peringatan ke
-            // exchange 'city.events' (routing key 'anomaly.alert') agar citizen-service
-            // (yang sudah punya consumer untuk topik ini) otomatis mengirim notifikasi.
+            $this->publisher->publish('power.new', $record);
+
             $thresholdKw = (float)($zone['transformer_capacity_kva'] ?? 0);
             if ($thresholdKw > 0 && (float)$data['power_demand_kw'] > $thresholdKw) {
                 $this->publisher->publish('anomaly.alert', [
