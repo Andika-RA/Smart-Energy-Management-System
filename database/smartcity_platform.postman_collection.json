@@ -1,0 +1,580 @@
+{
+	"info": {
+		"_postman_id": "8b5f39c2-5b94-4d89-a21c-5509a25b3fa2",
+		"name": "Smart City Integrated Platform",
+		"description": "API Collection for Smart City Integrated Platform including Gateway, OAuth, Citizen, Power, Grid, and ML Services.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth & System",
+			"item": [
+				{
+					"name": "Get OAuth Token (Password Grant)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "budi@warga.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "rootpass",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "mobile_app",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "secret",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/token",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Gateway Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{GATEWAY_URL}}/health",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Citizen Service",
+			"item": [
+				{
+					"name": "Create Citizen",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nik\": \"3171234567890999\",\n  \"name\": \"Erlangga Putra\",\n  \"email\": \"erlangga@warga.com\",\n  \"password\": \"password123\",\n  \"phone\": \"081299998888\",\n  \"zone_id\": 2,\n  \"role\": \"resident\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/citizens",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"citizens"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Citizen Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/citizens/3",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"citizens",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Report",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"citizen_id\": 3,\n  \"category\": \"Kelistrikan\",\n  \"description\": \"Trafo meledak di tiang listrik jalan utama\",\n  \"zone_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/reports",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reports",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/reports",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Report Status (Admin Only)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"investigating\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/reports/1/status",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"1",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Citizen Service Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8001/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Power Service",
+			"item": [
+				{
+					"name": "Get Power Demands",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/power",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"power"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Record Power Demand",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"zone_id\": 2,\n  \"power_demand_kw\": 45.8\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/power",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"power"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Power Service Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8002/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8002",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Grid Service",
+			"item": [
+				{
+					"name": "Get Zone Infrastructure Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/zones",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"zones"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Record Grid Reading",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"zone_id\": 2,\n  \"voltage\": 218.4,\n  \"current\": 48.5,\n  \"power_factor\": 0.90\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/api/grid-readings",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"api",
+								"grid-readings"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Grid Service Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8003/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ML Service",
+			"item": [
+				{
+					"name": "Predict Power Demand",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"REQ-POWER-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"hour\": 14,\n  \"day_of_week\": 5,\n  \"temperature\": 32.5,\n  \"prev_demand\": 73.5,\n  \"zone\": \"Kawasan Industri A\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/predict/power",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"predict",
+								"power"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Predict Grid Quality",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"REQ-GRID-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"zone\": \"Perumahan Griya\",\n  \"voltage\": 218.4,\n  \"current\": 45.5,\n  \"power_factor\": 0.88,\n  \"temperature\": 31.0,\n  \"humidity\": 70.0\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/predict/grid-quality",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"predict",
+								"grid-quality"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detect Anomaly",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"REQ-ANOMALY-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"zone\": \"Pasar Tradisional\",\n  \"sensor_value\": 195.0,\n  \"timestamp_hour\": 14,\n  \"rolling_mean_1h\": 205.5,\n  \"z_score\": -2.5\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/detect/anomaly",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"detect",
+								"anomaly"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Predict Batch Power Demand",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requests\": [\n    {\n      \"id\": \"REQ-BATCH-001\",\n      \"timestamp\": \"2026-06-27T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 32.5,\n      \"prev_demand\": 73.5,\n      \"zone\": \"Kawasan Industri A\"\n    },\n    {\n      \"id\": \"REQ-BATCH-002\",\n      \"timestamp\": \"2026-06-27T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 31.0,\n      \"prev_demand\": 8.5,\n      \"zone\": \"Perumahan Griya\"\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/predict/batch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"predict",
+								"batch"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Feature Importance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/model/feature-importance",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"model",
+								"feature-importance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ML Service Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "GATEWAY_URL",
+			"value": "http://localhost:3060",
+			"type": "string"
+		},
+		{
+			"key": "ACCESS_TOKEN",
+			"value": "your_access_token_here",
+			"type": "string"
+		},
+		{
+			"key": "ADMIN_TOKEN",
+			"value": "your_admin_token_here",
+			"type": "string"
+		}
+	]
+}

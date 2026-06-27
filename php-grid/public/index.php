@@ -52,7 +52,14 @@ $incidentController = new GridIncidentController();
 
 // Routing
 if ($baseUri === '/health' && $method === 'GET') {
-    sendResponse("success", 200, null, "Grid Service is healthy");
+    try {
+        $db = new \app\Database();
+        $conn = $db->getConnection();
+        $conn->query("SELECT 1");
+        sendResponse("success", 200, ["database" => "connected"], "Grid Service is healthy");
+    } catch (\Exception $e) {
+        sendResponse("error", 500, ["database" => "disconnected", "error" => $e->getMessage()], "Grid Service is unhealthy");
+    }
 }
 // Zone Routes
 elseif ($baseUri === '/api/zones' || $baseUri === '/api/zone') {

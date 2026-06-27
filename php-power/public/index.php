@@ -48,7 +48,14 @@ use app\controllers\ForecastController;
 
 // Routing
 if ($baseUri === '/health' && $method === 'GET') {
-    sendResponse("success", 200, null, "Power Service is healthy");
+    try {
+        $db = new \app\Database();
+        $conn = $db->getConnection();
+        $conn->query("SELECT 1");
+        sendResponse("success", 200, ["database" => "connected"], "Power Service is healthy");
+    } catch (\Exception $e) {
+        sendResponse("error", 500, ["database" => "disconnected", "error" => $e->getMessage()], "Power Service is unhealthy");
+    }
 }
 // Power Demand Routes
 elseif ($baseUri === '/api/power') {

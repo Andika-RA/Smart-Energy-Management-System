@@ -5,7 +5,6 @@ namespace app\controllers;
 use app\models\PowerDemand;
 use app\models\ZoneInfrastructure;
 use app\services\RabbitMQPublisher;
-use app\services\RabbitMQPublisher;
 
 class PowerController {
     private PowerDemand $model;

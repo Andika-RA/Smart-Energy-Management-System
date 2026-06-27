@@ -87,39 +87,30 @@ app.post("/oauth/token", async (req, res) => {
       return sendResponse(res, "error", 400, null, "username and password are required");
     }
 
-    if (username === "admin" && password === "password") {
-      payload = {
-        sub: "admin",
-        role: "admin",
-        scope: "smart-energy"
-      };
-      user_type = "admin";
-    } else {
-      try {
-        const [rows] = await pool.query(
-          "SELECT * FROM citizen_citizens WHERE email = ? OR nik = ?",
-          [username, username]
-        );
+    try {
+      const [rows] = await pool.query(
+        "SELECT * FROM citizen_citizens WHERE email = ? OR nik = ?",
+        [username, username]
+      );
 
-        if (rows.length === 0) {
-          return sendResponse(res, "error", 401, null, "Invalid username or password");
-        }
-
-        const citizen = rows[0];
-        if (password !== citizen.nik) {
-          return sendResponse(res, "error", 401, null, "Invalid username or password");
-        }
-
-        payload = {
-          sub: citizen.email,
-          role: citizen.role,
-          scope: citizen.role === "admin" ? "smart-energy" : "smart-energy:citizen"
-        };
-        user_id = citizen.id;
-        user_type = citizen.role;
-      } catch (err) {
-        return sendResponse(res, "error", 500, null, "Database error: " + err.message);
+      if (rows.length === 0) {
+        return sendResponse(res, "error", 401, null, "Invalid username or password");
       }
+
+      const citizen = rows[0];
+      if (password !== citizen.nik) {
+        return sendResponse(res, "error", 401, null, "Invalid username or password");
+      }
+
+      payload = {
+        sub: citizen.email,
+        role: citizen.role,
+        scope: citizen.role === "admin" ? "smart-energy" : "smart-energy:citizen"
+      };
+      user_id = citizen.id;
+      user_type = citizen.role;
+    } catch (err) {
+      return sendResponse(res, "error", 500, null, "Database error: " + err.message);
     }
   } else if (grant_type === "client_credentials") {
     if (!client_id || !client_secret) {

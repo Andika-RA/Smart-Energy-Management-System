@@ -133,6 +133,8 @@ def get_feature_importance():
 
 @app.post("/predict/batch")
 def predict_batch_power(data: BatchPowerIn):
+    if 'power_regression' not in BUNDLE:
+        raise HTTPException(status_code=500, detail="Model Power Demand belum siap.")
     results = []
     b = BUNDLE['power_regression']
     for d in data.requests:
