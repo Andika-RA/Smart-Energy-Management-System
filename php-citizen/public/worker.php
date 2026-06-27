@@ -1,11 +1,9 @@
 <?php
-require_once __DIR__ . '/vendor/autoload.php';
+
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use app\Database; // BUG FIX: sebelumnya 'use App\Database;' (huruf A besar) tidak pernah
-                   // cocok dengan namespace asli 'app\Database' (huruf a kecil). Autoload
-                   // Composer (PSR-4) bersifat case-sensitive, sehingga class ini selalu
-                   // gagal ditemukan dan worker langsung crash saat pesan pertama diterima.
+use app\Database;
 
 $host = getenv('RABBITMQ_HOST') ?: 'rabbitmq';
 $port = (int)(getenv('RABBITMQ_PORT') ?: 5672);
@@ -36,7 +34,6 @@ try {
         $stmt->execute([$zone_id]);
         $citizens = $stmt->fetchAll();
 
-        // Notification
         if (count($citizens) > 0) {
             $insertStmt = $db->prepare("INSERT INTO citizen_notifications (citizen_id, is_broadcast, title, body, is_read, created_at) VALUES (?, 0, ?, ?, 0, ?)");
             $now = date('Y-m-d H:i:s');

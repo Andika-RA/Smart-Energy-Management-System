@@ -9,7 +9,7 @@ use PDOException;
 class ForecastController {
     private Forecast $model;
     private ZoneInfrastructure $zoneModel;
-    private array $allowedStatus = ['Lancar', 'Sedang', 'Padat'];
+    private array $allowedStatus = ['Normal', 'Tinggi', 'Puncak'];
 
     public function __construct() {
         $this->model = new Forecast();

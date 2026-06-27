@@ -133,6 +133,24 @@ services:
         condition: service_healthy
     networks: 
       - smartcity-net
+  
+  citizen-worker:
+    build: ./php-citizen
+    container_name: smartcity-citizen-worker
+    command: ["php", "public/worker.php"]
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - smartcity-net
  
   # ── AI & IOT LAYER ───────────────────────────────────────────────────────
   python-ml:

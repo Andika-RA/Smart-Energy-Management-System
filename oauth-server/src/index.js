@@ -106,7 +106,9 @@ app.post("/oauth/token", async (req, res) => {
         }
 
         const citizen = rows[0];
-        if (password !== citizen.nik) {
+        const isPasswordValid = await bcrypt.compare(password, citizen.password);
+
+        if (!isPasswordValid) {
           return sendResponse(res, "error", 401, null, "Invalid username or password");
         }
 

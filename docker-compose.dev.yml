@@ -1,0 +1,37 @@
+# docker-compose.dev.yml
+# Override untuk pengembangan lokal (hot-reload). Pakai bersamaan dengan file utama:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Mount source code sebagai volume + jalankan mode --watch, supaya perubahan
+# kode langsung terlihat tanpa perlu `docker compose build` ulang setiap saat.
+
+services:
+  oauth-server:
+    command: npm run dev
+    volumes:
+      - ./oauth-server/src:/app/src
+    environment:
+      - NODE_ENV=development
+
+  api-gateway:
+    command: npm run dev
+    volumes:
+      - ./express-gateway/src:/app/src
+    environment:
+      - NODE_ENV=development
+
+  citizen-service:
+    volumes:
+      - ./php-citizen/app:/var/www/html/app
+      - ./php-citizen/public:/var/www/html/public
+
+  grid-service:
+    volumes:
+      - ./php-grid/app:/var/www/html/app
+      - ./php-grid/public:/var/www/html/public
+
+  power-service:
+    volumes:
+      - ./php-power/app:/var/www/html/app
+      - ./php-power/public:/var/www/html/public

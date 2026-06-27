@@ -21,11 +21,12 @@ class Citizen {
 
         $stmt = $this->conn->prepare($query);
 
-        // Bind parameter
+        $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+
         $stmt->bindParam(':nik', $data['nik']);
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':password', $data['password']);
+        $stmt->bindParam(':password', $hashedPassword);
         $stmt->bindParam(':phone', $data['phone']);
         $stmt->bindParam(':zone_id', $data['zone_id']);
         $stmt->bindParam(':role', $data['role']);
