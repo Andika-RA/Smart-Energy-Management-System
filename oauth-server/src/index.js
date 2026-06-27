@@ -170,7 +170,6 @@ app.post("/oauth/token", async (req, res) => {
 
       const tokenRecord = tokenRows[0];
 
-      // Revoke/Delete the old refresh token record
       await pool.query("DELETE FROM shared_oauth_tokens WHERE id = ?", [tokenRecord.id]);
 
       user_id = tokenRecord.user_id;

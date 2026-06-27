@@ -20,7 +20,7 @@ async function authMiddleware(req, res, next) {
     return res.status(401).json({
       status: "error",
       code: 401,
-      message: "Unauthorized",
+      message: "Unauthorized - Token tidak ditemukan",
       service: "api-gateway"
     });
   }
@@ -31,7 +31,7 @@ async function authMiddleware(req, res, next) {
     return res.status(401).json({
       status: "error",
       code: 401,
-      message: "Unauthorized",
+      message: "Unauthorized - Signature Token tidak valid",
       service: "api-gateway"
     });
   }
@@ -51,7 +51,7 @@ async function authMiddleware(req, res, next) {
       return res.status(401).json({
         status: "error",
         code: 401,
-        message: "Unauthorized",
+        message: "Unauthorized - Token sudah tidak aktif atau expired",
         service: "api-gateway"
       });
     }
@@ -62,22 +62,23 @@ async function authMiddleware(req, res, next) {
     return res.status(503).json({
       status: "error",
       code: 503,
-      message: "OAuth service unavailable",
+      message: "OAuth service unavailable or timeout",
       service: "api-gateway"
     });
   }
 }
 
-function adminMiddleware(req, res, next) {
-  if (!req.user || req.user.role !== "admin") {
+async function adminMiddleware(req, res, next) {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
     return res.status(403).json({
       status: "error",
       code: 403,
-      message: "Forbidden: Access denied. Admin role required.",
+      message: "Forbidden - Akses khusus Admin",
       service: "api-gateway"
     });
   }
-  next();
 }
 
 module.exports = { authMiddleware, adminMiddleware };

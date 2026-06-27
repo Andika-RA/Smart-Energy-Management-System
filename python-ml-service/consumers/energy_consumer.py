@@ -12,8 +12,10 @@ def start_consumer():
         rabbitmq_host = os.getenv('RABBITMQ_HOST', 'localhost')
         conn = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
         ch = conn.channel()
-        print("[*] Memuat model Machine Learning dari models/smartcity_models.pkl ...")
-        bundle = joblib.load("models/smartcity_models.pkl")
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        MODEL_PATH = os.path.join(BASE_DIR, "models", "smartcity_models.pkl")
+        print(f"[*] Memuat model Machine Learning dari {MODEL_PATH} ...")
+        bundle = joblib.load(MODEL_PATH)
         b_anomaly = bundle['anomaly']
         ch.exchange_declare(exchange='city.events', exchange_type='topic', durable=True)
         ch.queue_declare(queue='energy.new', durable=True)

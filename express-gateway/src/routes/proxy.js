@@ -1,4 +1,4 @@
-const { createProxyMiddleware } = require("http-proxy-middleware");
+const { createProxyMiddleware, fixRequestBody } = require("http-proxy-middleware");
 const services = require("../config/services");
 const { authMiddleware, adminMiddleware } = require("../middleware/auth");
 const { authLimiter } = require("../middleware/rateLimit");
@@ -22,22 +22,22 @@ const injectUserHeaders = (proxyReq, req, res) => {
 };
 
 function registerProxyRoutes(app) {
-  app.use("/oauth", createProxyMiddleware({ target: services.oauth, changeOrigin: true, on: { error: proxyErrorHandler } }));
-  app.patch("/api/reports/:id/status", authLimiter, authMiddleware, adminMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/citizens", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/reports", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/notifications", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/power", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/weather", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/forecast", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/grid", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/zones", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/grid-readings", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/grid-quality", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/api/grid-incidents", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/predict", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/detect", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
-  app.use("/model", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/oauth", createProxyMiddleware({ target: services.oauth, changeOrigin: true, onProxyReq: fixRequestBody, on: { error: proxyErrorHandler } }));
+  app.patch("/api/reports/:id/status", authLimiter, authMiddleware, adminMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/citizens", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/reports", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/notifications", authLimiter, authMiddleware, createProxyMiddleware({ target: services.citizen, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/power", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/weather", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/forecast", authLimiter, authMiddleware, createProxyMiddleware({ target: services.power, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/grid", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/zones", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/grid-readings", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/grid-quality", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/api/grid-incidents", authLimiter, authMiddleware, createProxyMiddleware({ target: services.grid, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/predict", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/detect", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
+  app.use("/model", authLimiter, authMiddleware, createProxyMiddleware({ target: services.ml, changeOrigin: true, onProxyReq: fixRequestBody, on: { proxyReq: injectUserHeaders, error: proxyErrorHandler } }));
 }
 
 module.exports = registerProxyRoutes;
