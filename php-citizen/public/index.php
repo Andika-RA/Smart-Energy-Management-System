@@ -33,7 +33,14 @@ use app\controllers\ReportController;
 use app\controllers\NotifController;
 
 if ($uri === '/health' && $method === 'GET') {
-    sendResponse("success", 200, null, "Citizen Service is healthy");
+    try {
+        $db = new \app\Database();
+        $conn = $db->getConnection();
+        $conn->query("SELECT 1");
+        sendResponse("success", 200, ["database" => "connected"], "Citizen Service is healthy");
+    } catch (\Exception $e) {
+        sendResponse("error", 500, ["database" => "disconnected", "error" => $e->getMessage()], "Citizen Service is unhealthy");
+    }
 }
 // Endpoints Citizen
 elseif ($uri === '/api/citizens' && $method === 'POST') {

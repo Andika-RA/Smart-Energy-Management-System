@@ -24,8 +24,7 @@ class Database {
                 $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             } catch (PDOException $exception) {
-                echo json_encode(["error" => "Connection error: " . $exception->getMessage()]);
-                exit;
+                throw $exception;
             }
         }
         return $this->connection;

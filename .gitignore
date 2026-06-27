@@ -129,3 +129,6 @@ temp/
 *.tmp
 *.swp
 *.swo
+
+# AGENT METADATA
+.agents/
