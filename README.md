@@ -1,199 +1,168 @@
 # Smart City Integrated Platform (Smart Energy & Power Grid)
+### Tugas Besar Ujian Akhir Semester — Rekayasa Perangkat Lunak 2 (SE.2)
 
-This is the Smart City Integrated Platform, focusing on the **Smart Energy and Power Grid** sub-theme. The platform integrates an API Gateway, an OAuth 2.0 Authorization Server, multiple downstream PHP services, a Python Machine Learning Service, and an IoT event ingestion pipeline.
+Platform terintegrasi ini dirancang khusus untuk sub-tema **Smart Energy dan Power Grid**. Sistem ini dibangun dengan arsitektur microservices yang saling berkomunikasi secara aman melalui API Gateway, diamankan dengan protokol OAuth 2.0, serta memanfaatkan layanan Machine Learning untuk mendeteksi anomali jaringan dan memprediksi konsumsi daya secara real-time.
 
 ---
 
-## 🗺️ Folder Layout
+## 👥 Informasi Kelompok & Akademik
+
+* **Mata Kuliah**: SE.2 (A)
+* **Dosen Pengampu**: Muhammad Panji Muslim, S.Pd., M.Kom.
+* **Program Studi**: S1 Informatika
+* **Kelompok**: 5
+
+### Anggota Kelompok & Pembagian Kerja
+
+| Nama Anggota | Peran / Tanggung Jawab | Deskripsi Pekerjaan |
+| :--- | :--- | :--- |
+| **Rafly Dzakki Pratama** | **Ketua Kelompok & ML/IoT Engineer** | Machine Learning Service (FastAPI), IoT Event Ingestion Pipeline (Simulasi Wokwi ESP32, Node-RED, RabbitMQ, Mosquitto MQTT), manifest Kubernetes (K8s), dan Dasbor Monitoring (Prometheus & Grafana). |
+| **Hesham Alshami** | **Grid Service Developer** | Pengembangan Grid Service (PHP MVC) untuk mengelola data trafo, wilayah (zone), dan gangguan/insiden jaringan listrik. |
+| **Arkhandika Budi Widodoputra** | **Citizen Service Developer** | Pengembangan Citizen Service (PHP MVC) untuk mengelola data warga, pelaporan isu, dan notifikasi warga. |
+| **Amanda Puspitarina** | **Power Service Developer** | Pengembangan Power Service (PHP MVC) untuk mengelola pencatatan konsumsi daya, prakiraan energi, dan logs cuaca. |
+| **Andika Rafa Akbar** | **Gateway & Auth Engineer** | API Gateway (Node.js/Express), OAuth 2.0 Authorization Server, persiapan repositori utama, dan penyusunan struktur direktori awal. |
+
+---
+
+## 🗺️ Struktur Folder Proyek
 
 ```plaintext
-├── database/              # SQL schemas, seed scripts, and Postman API collection
-│   ├── schema.sql         # Database schema definition
-│   ├── seed.sql           # Database seed data (citizens, readings, client credentials)
-│   └── smartcity_platform.postman_collection.json # API endpoints collection
-├── express-gateway/       # API Gateway built with Node.js and Express
-├── iot/                   # IoT simulations and configs
-│   ├── simulator.py       # ESP32 Grid Sensor simulator
-│   ├── mosquitto.conf     # Mosquitto MQTT broker configuration
-│   └── node-red-data/     # Node-RED event processing flows
-├── k8s/                   # Kubernetes manifests for orchestration
-├── monitoring/            # Prometheus and Grafana dashboards for observability
-├── oauth-server/          # OAuth 2.0 Authorization Server
-├── php-citizen/           # Downstream PHP service managing citizen profiles and reports
-├── php-grid/              # Downstream PHP service managing physical grid zones
-├── php-power/             # Downstream PHP service managing power consumption metrics
-├── python-ml-service/     # FastAPI service hosting ML models (Demand, Quality, Anomaly)
-├── docker-compose.yml     # Core Docker Compose orchestration file
-├── Makefile               # Helper commands for local environment management
-└── README.md              # Project documentation (this file)
+├── database/              # Skema SQL, seeder data, dan file Postman Collection API
+│   ├── schema.sql         # Definisi skema tabel database
+│   ├── seed.sql           # Data awal/dummy (warga, pembacaan sensor, klien OAuth)
+│   └── smartcity_platform.postman_collection.json # Ekspor koleksi API Postman
+├── express-gateway/       # API Gateway berbasis Node.js dan Express
+├── iot/                   # Konfigurasi simulasi IoT
+│   ├── simulator.py       # Simulator sensor listrik ESP32
+│   ├── mosquitto.conf     # Konfigurasi MQTT Broker Mosquitto
+│   └── node-red-data/     # Alur pemrosesan data sensor di Node-RED
+├── k8s/                   # Manifest orkestrasi Kubernetes (K8s)
+├── monitoring/            # Dasbor pemantauan Prometheus dan Grafana
+├── oauth-server/          # Server Otorisasi OAuth 2.0
+├── php-citizen/           # Microservice PHP untuk Warga (Citizen) & Pengaduan
+├── php-grid/              # Microservice PHP untuk Pengelolaan Jaringan Listrik
+├── php-power/             # Microservice PHP untuk Pencatatan Daya & Cuaca
+├── python-ml-service/     # FastAPI Service untuk model ML (Prediksi & Anomali)
+├── docker-compose.yml     # File orkestrasi Docker Compose utama
+└── README.md              # Dokumentasi proyek ini (file ini)
 ```
 
 ---
 
-## ⚙️ Prerequisites
+## ⚙️ Prasyarat Sistem
 
-To run this platform, ensure you have the following installed:
-- **Docker** (v20.10+) and **Docker Compose** (v2.0+)
-- **Git**
-- **Node.js** (v18+) & **npm** (for local/manual development of Node.js services)
-- **PHP** (v8.1+) & **Composer** (for local/manual PHP service running)
-- **Python** (v3.9+) & **pip** (for local/manual Python service running)
+Sebelum menjalankan platform ini, pastikan perangkat Anda telah terpasang:
+* **Docker** (v20.10+) dan **Docker Compose** (v2.0+)
+* **Git**
+* **Node.js** (v18+) & **npm** (jika ingin menjalankan Gateway/OAuth secara manual)
+* **PHP** (v8.1+) & **Composer** (jika ingin menjalankan PHP Service secara manual)
+* **Python** (v3.9+) & **pip** (jika ingin menjalankan ML Service secara manual)
 
 ---
 
-## 🚀 Local Setup Instructions
+## 🚀 Langkah Instalasi & Menjalankan Sistem
 
-### 1. Environment Configuration
-Copy the `.env.example` file to `.env` at the root level and configure the environment variables:
+### 1. Konfigurasi Environment (Keamanan Kredensial)
+Untuk menjaga keamanan, **jangan pernah menyimpan password, JWT secret, atau kredensial sensitif di dalam kode yang di-push ke Git**. Proyek ini menggunakan file `.env` lokal untuk menyimpan semua kredensial sensitif tersebut. File `.env` telah didaftarkan di dalam `.gitignore` sehingga aman dan tidak akan terunggah ke repositori GitHub.
+
+Salin file template `.env.example` di root menjadi `.env` lokal Anda:
 ```bash
 cp .env.example .env
 ```
-Ensure database credentials, JWT secrets, and RabbitMQ connection info are set correctly in `.env`.
+Setelah disalin, buka file `.env` tersebut dan isi variabel konfigurasi (seperti JWT secret, password DB, dan koneksi RabbitMQ) sesuai dengan lingkungan lokal Anda.
 
-### 2. Launching Services with Docker Compose
-To build and start all system services (MySQL, RabbitMQ, Mosquitto, API Gateway, OAuth Server, Downstream PHP Services, Python ML Service, Prometheus, and Grafana) in the background, run:
+### 2. Menjalankan Seluruh Layanan dengan Docker Compose
+Untuk membangun image dan menjalankan seluruh 12 container (MySQL, RabbitMQ, Mosquitto, API Gateway, OAuth Server, Downstream PHP Services, Python ML Service, Prometheus, Grafana, dan IoT Simulator) di latar belakang:
 ```bash
-# Using Makefile
-make up
-
-# Alternatively, using docker compose directly
+# Menjalankan container
 docker compose up -d --build
 ```
 
-To view system logs:
+Untuk melihat logs dari seluruh container yang berjalan:
 ```bash
-make logs
+docker compose logs -f
 ```
 
-To stop all services:
+Untuk menghentikan seluruh layanan:
 ```bash
-make down
+docker compose down
 ```
 
 ---
 
-## 🗄️ Database Seeding
+## 🗄️ Inisialisasi Database (Seeding)
 
-The database will seed automatically during initialization, or can be seeded manually.
-
-### Automatic Seeding
-The MySQL container mounts `./database` to `/docker-entrypoint-initdb.d`. Upon first run:
-1. `schema.sql` creates the database tables.
-2. `seed.sql` populates initial data including zones, oauth clients, and citizen records.
-
-### Manual Seeding
-If you need to reset the database and reseed at any time, execute the following command:
+Database akan terisi secara otomatis saat inisialisasi Docker Compose pertama kali dijalankan. Jika Anda ingin melakukan reset database dan memasukkan ulang data dummy (seeder) secara manual, jalankan perintah berikut:
 ```bash
 docker exec -i smartcity-mysql mysql -u root -prootpass smartcity < database/seed.sql
 ```
-*(Replace `rootpass` with your `DB_PASS` from `.env` if changed).*
+*(Sesuaikan `rootpass` dengan nilai `DB_PASS` pada file `.env` Anda jika diubah)*.
 
 ---
 
-## 🧪 Test Scenarios
+## 🧪 Skenario Demo Utama (Uji Coba)
 
-### 1. Authentication & OAuth 2.0
-The platform uses JWT-based OAuth 2.0. Users must first retrieve a token.
+Sistem ini mendukung pengujian alur kerja end-to-end (E2E) melalui API Gateway pada port `3060`:
 
-#### Password Grant (Citizen/Admin Logins)
-Retrieve a token by sending a request to the API Gateway `/oauth/token` endpoint. All logins (including admin) query the database and verify user credentials (email or NIK as username, and NIK as password).
-- **Request**:
+### Skenario 1: Uji Status Kesehatan Layanan (Health Checks)
+Kirim request `GET` untuk memastikan konektivitas database dari masing-masing microservice:
+* API Gateway Health: `GET http://localhost:3060/health`
+* Citizen Service: `GET http://localhost:8000/health`
+* Power Service: `GET http://localhost:8002/health`
+* Grid Service: `GET http://localhost:8001/health`
+* ML Service: `GET http://localhost:5000/health`
+
+### Skenario 2: Login Warga & Pembuatan Laporan
+1. Dapatkan token JWT menggunakan *Password Grant* warga (password default seeder adalah `secret`):
+   ```http
+   POST http://localhost:3060/oauth/token
+   Content-Type: application/json
+
+   {
+     "grant_type": "password",
+     "username": "budi@warga.com",
+     "password": "secret"
+   }
+   ```
+2. Gunakan `access_token` yang diperoleh untuk mengirim laporan masalah listrik baru melalui Gateway:
+   ```http
+   POST http://localhost:3060/api/reports
+   Authorization: Bearer <Access_Token_Anda>
+   Content-Type: application/json
+
+   {
+     "title": "Listrik Padam di Blok C",
+     "description": "Terjadi pemadaman listrik secara tiba-tiba sejak 10 menit lalu.",
+     "category": "outage",
+     "zone_id": 2
+   }
+   ```
+
+### Skenario 3: Pembatasan Akses Khusus Admin (RBAC)
+Mencoba memperbarui status laporan menggunakan akun warga biasa akan ditolak oleh API Gateway:
+* **Request (Warga Biasa - Ditolak)**:
   ```http
-  POST http://localhost:3000/oauth/token
+  PATCH http://localhost:3060/api/reports/1/status
+  Authorization: Bearer <Token_Warga>
   Content-Type: application/json
 
-  {
-    "grant_type": "password",
-    "username": "nik_or_email_here",
-    "password": "nik_here"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "code": 200,
-    "data": {
-      "access_token": "eyJhbGciOi...",
-      "token_type": "Bearer",
-      "expires_in": 3600,
-      "refresh_token": "..."
-    },
-    "message": "Token issued"
-  }
-  ```
-
-#### Client Credentials Grant (Internal Services)
-- **Request**:
-  ```http
-  POST http://localhost:3000/oauth/token
-  Content-Type: application/json
-
-  {
-    "grant_type": "client_credentials",
-    "client_id": "client_id_here",
-    "client_secret": "client_secret_here"
-  }
-  ```
-
----
-
-### 2. Role-Based Access Control (RBAC)
-
-Downstream API resources verify user permissions through the API Gateway, which validates token roles:
-- **`citizen`**: Can access public and citizen-owned data.
-- **`admin`**: Full write access, including updating report statuses.
-
-#### Scenario: Update Incident Report Status (Admin Only)
-- **Unauthorized/Citizen Request** (fails):
-  ```http
-  PATCH http://localhost:3000/api/reports/1/status
-  Authorization: Bearer <Citizen_Token>
-  Content-Type: application/json
-
-  {
-    "status": "resolved"
-  }
+  { "status": "resolved" }
   ```
   *Response*: `403 Forbidden - Akses khusus Admin`
 
-- **Authorized Admin Request** (succeeds):
+* **Request (Admin - Berhasil)**:
+  Login sebagai admin (`admin1@smartcity.com` / `secret`) untuk mendapatkan token admin, lalu kirim kembali request di atas. Status laporan akan berhasil diperbarui dengan response `200 OK`.
+
+### Skenario 4: Prediksi ML Real-time & Batch
+* **Prediksi Konsumsi Daya (Power Demand)**:
   ```http
-  PATCH http://localhost:3000/api/reports/1/status
-  Authorization: Bearer <Admin_Token>
-  Content-Type: application/json
-
-  {
-    "status": "resolved"
-  }
-  ```
-  *Response*: `200 OK`
-
----
-
-### 3. Rate-Limiting
-
-The API Gateway enforces rate-limiting at two levels:
-- **Global Rate Limiter**: Maximum 100 requests per 15 minutes per IP address. Unauthenticated requests that exceed this limit receive a `429 Too Many Requests`.
-- **Authenticated Rate Limiter**: Maximum 500 requests per hour per authenticated client/user token.
-
----
-
-### 4. Machine Learning Endpoints
-
-The Python ML Service (`/predict`, `/detect`, `/model`) provides endpoints through the gateway for inference.
-
-#### Power Demand Prediction (Regression)
-Predict power demand for a zone.
-- **Request**:
-  ```http
-  POST http://localhost:3000/predict/power
-  Authorization: Bearer <token>
+  POST http://localhost:3060/predict/power
+  Authorization: Bearer <Access_Token>
   Content-Type: application/json
 
   {
     "id": "req-001",
-    "timestamp": "2026-06-27T12:00:00Z",
+    "timestamp": "2026-06-28T12:00:00Z",
     "hour": 12,
     "day_of_week": 5,
     "temperature": 31.5,
@@ -201,51 +170,16 @@ Predict power demand for a zone.
     "zone": "Kawasan Industri A"
   }
   ```
-- **Response**:
-  ```json
-  {
-    "status": "success",
-    "code": 200,
-    "data": {
-      "id": "req-001",
-      "timestamp": "2026-06-27T12:00:00Z",
-      "predicted_demand_kw": 298.54,
-      "status": "Normal"
-    }
-  }
-  ```
 
-#### Grid Quality Classification
-Classify network quality status.
-- **Request**:
+* **Deteksi Anomali Sensor**:
   ```http
-  POST http://localhost:3000/predict/grid-quality
-  Authorization: Bearer <token>
+  POST http://localhost:3060/detect/anomaly
+  Authorization: Bearer <Access_Token>
   Content-Type: application/json
 
   {
     "id": "req-002",
-    "timestamp": "2026-06-27T12:00:00Z",
-    "zone": "Perumahan Griya",
-    "voltage": 220.5,
-    "current": 15.2,
-    "power_factor": 0.95,
-    "temperature": 28.0,
-    "humidity": 65.0
-  }
-  ```
-
-#### Anomaly Detection
-Detect anomalies in sensor feeds.
-- **Request**:
-  ```http
-  POST http://localhost:3000/detect/anomaly
-  Authorization: Bearer <token>
-  Content-Type: application/json
-
-  {
-    "id": "req-003",
-    "timestamp": "2026-06-27T12:00:00Z",
+    "timestamp": "2026-06-28T12:00:00Z",
     "zone": "Pusat Bisnis CBD",
     "sensor_value": 450.0,
     "timestamp_hour": 12,
@@ -254,33 +188,6 @@ Detect anomalies in sensor feeds.
   }
   ```
 
-#### Feature Importance
-Fetch the trained Random Forest feature importance metrics.
-- **Request**:
-  ```http
-  GET http://localhost:3000/model/feature-importance
-  Authorization: Bearer <token>
-  ```
+---
 
-#### Batch Power Demand Prediction
-Predict power demands in batches.
-- **Request**:
-  ```http
-  POST http://localhost:3000/predict/batch
-  Authorization: Bearer <token>
-  Content-Type: application/json
-
-  {
-    "requests": [
-      {
-        "id": "batch-1",
-        "timestamp": "2026-06-27T12:00:00Z",
-        "hour": 12,
-        "day_of_week": 5,
-        "temperature": 31.5,
-        "prev_demand": 280.0,
-        "zone": "Kawasan Industri A"
-      }
-    ]
-  }
-  ```
+*Seluruh endpoint uji coba lengkap dengan contoh body request dapat langsung diuji secara instan dengan meng-import koleksi Postman yang terletak pada `database/smartcity_platform.postman_collection.json` ke aplikasi Postman Anda.*
