@@ -31,8 +31,8 @@ services:
     image: rabbitmq:3.12-management
     container_name: smartcity-rabbitmq
     ports:
-      - "5672:5672"   
-      - "15672:15672"
+      - "5675:5672"   
+      - "15675:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
@@ -42,7 +42,7 @@ services:
     image: eclipse-mosquitto:2.0
     container_name: smartcity-mosquitto
     ports: 
-      - "18830:1883"
+      - "1885:1883"
     volumes: 
       - ./iot/mosquitto.conf:/mosquitto/config/mosquitto.conf
     networks: 
@@ -52,7 +52,7 @@ services:
   oauth-server:
     build: ./oauth-server
     container_name: smartcity-oauth
-    ports: ["3002:3002"]
+    ports: ["3005:3002"]
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - DB_HOST=${DB_HOST}
@@ -69,7 +69,7 @@ services:
     build: ./express-gateway
     container_name: smartcity-gateway
     ports: 
-      - "3060:3060"
+      - "3065:3060"
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - OAUTH_SERVER_URL=http://oauth-server:3002
@@ -87,7 +87,7 @@ services:
     build: ./php-citizen
     container_name: smartcity-citizen
     ports:
-      - "8000:80"
+      - "8005:80"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
@@ -104,7 +104,7 @@ services:
     build: ./php-grid
     container_name: smartcity-grid
     ports:
-      - "8001:80"
+      - "8015:80"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
@@ -121,7 +121,7 @@ services:
     build: ./php-power
     container_name: smartcity-power
     ports:
-      - "8002:80"
+      - "8025:80"
     environment: 
       - DB_HOST=${DB_HOST}
       - DB_NAME=${DB_NAME}
@@ -157,7 +157,7 @@ services:
     build: ./python-ml-service
     container_name: smartcity-python-ml
     ports:
-      - "5000:5000"
+      - "5005:5000"
     environment: 
       - RABBITMQ_HOST=${RABBITMQ_HOST}
     depends_on: 
@@ -169,7 +169,7 @@ services:
     image: nodered/node-red:3.1
     container_name: smartcity-nodered
     ports: 
-      - "18800:1880"
+      - "1888:1880"
     volumes: 
       - ./iot/node-red-data:/data
     networks: 
@@ -189,7 +189,7 @@ services:
     image: prom/prometheus:v2.48.0
     container_name: smartcity-prometheus
     ports: 
-      - "9090:9090" # Wajib Port 9090
+      - "9095:9090"
     volumes: 
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     networks: 
@@ -199,7 +199,7 @@ services:
     image: grafana/grafana:10.2.0
     container_name: smartcity-grafana
     ports: 
-      - "3001:3000"
+      - "3015:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASS}
