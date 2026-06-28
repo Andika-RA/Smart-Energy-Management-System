@@ -69,7 +69,7 @@ services:
     build: ./express-gateway
     container_name: smartcity-gateway
     ports: 
-      - "3000:3000"
+      - "3060:3060"
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - OAUTH_SERVER_URL=http://oauth-server:3002
