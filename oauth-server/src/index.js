@@ -44,6 +44,7 @@ const dbConfig = {
 const pool = mysql.createPool(dbConfig);
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 function sendResponse(res, status, code, data, message) {
   res.status(code).json({
