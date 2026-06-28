@@ -37,7 +37,7 @@ const dbConfig = {
   password: process.env.DB_PASS !== undefined ? process.env.DB_PASS : "rootpass",
   database: process.env.DB_NAME || "smartcity",
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 100,
   queueLimit: 0
 };
 
@@ -66,6 +66,7 @@ app.get("/health", async (req, res) => {
     await pool.query("SELECT 1");
     sendResponse(res, "success", 200, { oauth: "healthy", db: "connected" }, "OAuth Server healthy");
   } catch (err) {
+    console.error("Health check error:", err);
     sendResponse(res, "error", 500, { oauth: "healthy", db: "disconnected", error: err.message }, "OAuth Server DB disconnected");
   }
 });
@@ -121,6 +122,7 @@ app.post("/oauth/token", async (req, res) => {
         user_id = citizen.id;
         user_type = citizen.role;
       } catch (err) {
+        console.error("DB error (password):", err);
         return sendResponse(res, "error", 500, null, "Database error: " + err.message);
       }
     }
@@ -153,6 +155,7 @@ app.post("/oauth/token", async (req, res) => {
       };
       user_type = "service";
     } catch (err) {
+      console.error("DB error (client_credentials):", err);
       return sendResponse(res, "error", 500, null, "Database error: " + err.message);
     }
   } else if (grant_type === "refresh_token") {
@@ -197,6 +200,7 @@ app.post("/oauth/token", async (req, res) => {
         };
       }
     } catch (err) {
+      console.error("DB error (refresh_token):", err);
       return sendResponse(res, "error", 500, null, "Database error: " + err.message);
     }
   } else {
@@ -226,6 +230,7 @@ app.post("/oauth/token", async (req, res) => {
       ]
     );
   } catch (err) {
+    console.error("DB error (insert token):", err);
     return sendResponse(res, "error", 500, null, "Failed to store token: " + err.message);
   }
 
@@ -284,6 +289,7 @@ app.post("/oauth/revoke", async (req, res) => {
     );
     return sendResponse(res, "success", 200, null, "Token revoked");
   } catch (err) {
+    console.error("DB error (revoke):", err);
     return sendResponse(res, "error", 500, null, "Database error: " + err.message);
   }
 });
