@@ -2,66 +2,13 @@
 	"info": {
 		"_postman_id": "8b5f39c2-5b94-4d89-a21c-5509a25b3fa2",
 		"name": "Smart City Integrated Platform",
-		"description": "API Collection for Smart City Integrated Platform including Gateway, OAuth, Citizen, Power, Grid, and ML Services.",
+		"description": "Super Complete API Collection for Smart City Integrated Platform, including Gateway, OAuth 2.0 (Password, Client Credentials, Refresh Token, Introspect, Revoke), Citizen, Power, Grid, and ML Services.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "Auth & System",
 			"item": [
-				{
-					"name": "Get OAuth Token (Password Grant)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/x-www-form-urlencoded"
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "grant_type",
-									"value": "password",
-									"type": "text"
-								},
-								{
-									"key": "username",
-									"value": "budi@warga.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "secret",
-									"type": "text"
-								},
-								{
-									"key": "client_id",
-									"value": "mobile_app",
-									"type": "text"
-								},
-								{
-									"key": "client_secret",
-									"value": "secret",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/token",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "Gateway Health Check",
 					"request": {
@@ -78,6 +25,168 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get OAuth Token (Password Grant - Warga)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"grant_type\": \"password\",\n  \"username\": \"budi@warga.com\",\n  \"password\": \"secret\",\n  \"client_id\": \"mobile_app\",\n  \"client_secret\": \"secret\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/token",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get OAuth Token (Password Grant - Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"grant_type\": \"password\",\n  \"username\": \"admin1@smartcity.com\",\n  \"password\": \"secret\",\n  \"client_id\": \"mobile_app\",\n  \"client_secret\": \"secret\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/token",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get OAuth Token (Client Credentials)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"iot_gateway\",\n  \"client_secret\": \"secret\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/token",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get OAuth Token (Refresh Token)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"grant_type\": \"refresh_token\",\n  \"refresh_token\": \"YOUR_REFRESH_TOKEN_HERE\",\n  \"client_id\": \"mobile_app\",\n  \"client_secret\": \"secret\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/token",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Introspect Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{ACCESS_TOKEN}}\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/introspect",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"introspect"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"token\": \"{{ACCESS_TOKEN}}\"\n}"
+						},
+						"url": {
+							"raw": "{{GATEWAY_URL}}/oauth/revoke",
+							"host": [
+								"{{GATEWAY_URL}}"
+							],
+							"path": [
+								"oauth",
+								"revoke"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -85,13 +194,17 @@
 			"name": "Citizen Service",
 			"item": [
 				{
-					"name": "Create Citizen",
+					"name": "Create Citizen (Register)",
 					"request": {
 						"method": "POST",
 						"header": [
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ADMIN_TOKEN}}"
 							}
 						],
 						"body": {
@@ -190,7 +303,7 @@
 					"response": []
 				},
 				{
-					"name": "Update Report Status (Admin Only)",
+					"name": "Update Report Status (Admin - Harus Sukses)",
 					"request": {
 						"method": "PATCH",
 						"header": [
@@ -205,7 +318,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"status\": \"investigating\"\n}"
+							"raw": "{\n  \"status\": \"resolved\"\n}"
 						},
 						"url": {
 							"raw": "{{GATEWAY_URL}}/api/reports/1/status",
@@ -223,19 +336,33 @@
 					"response": []
 				},
 				{
-					"name": "Citizen Service Health Check",
+					"name": "Update Report Status (Resident - Harus Forbidden)",
 					"request": {
-						"method": "GET",
-						"header": [],
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"resolved\"\n}"
+						},
 						"url": {
-							"raw": "http://localhost:8005/health",
-							"protocol": "http",
+							"raw": "{{GATEWAY_URL}}/api/reports/1/status",
 							"host": [
-								"localhost"
+								"{{GATEWAY_URL}}"
 							],
-							"port": "8005",
 							"path": [
-								"health"
+								"api",
+								"reports",
+								"1",
+								"status"
 							]
 						}
 					},
@@ -299,25 +426,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Power Service Health Check",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8025/health",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8025",
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -373,25 +481,6 @@
 							"path": [
 								"api",
 								"grid-readings"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Grid Service Health Check",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8015/health",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8015",
-							"path": [
-								"health"
 							]
 						}
 					},
@@ -548,17 +637,79 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "Direct Service Health Checks (No Gateway)",
+			"item": [
 				{
-					"name": "ML Service Health Check",
+					"name": "Citizen Service Health",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:5005/health",
+							"raw": "http://{{SERVER_IP}}:8005/health",
 							"protocol": "http",
 							"host": [
-								"localhost"
+								"{{SERVER_IP}}"
+							],
+							"port": "8005",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Grid Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{SERVER_IP}}:8015/health",
+							"protocol": "http",
+							"host": [
+								"{{SERVER_IP}}"
+							],
+							"port": "8015",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Power Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{SERVER_IP}}:8025/health",
+							"protocol": "http",
+							"host": [
+								"{{SERVER_IP}}"
+							],
+							"port": "8025",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ML Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{SERVER_IP}}:5005/health",
+							"protocol": "http",
+							"host": [
+								"{{SERVER_IP}}"
 							],
 							"port": "5005",
 							"path": [
@@ -574,7 +725,12 @@
 	"variable": [
 		{
 			"key": "GATEWAY_URL",
-			"value": "http://localhost:3065",
+			"value": "http://103.147.92.135:3065",
+			"type": "string"
+		},
+		{
+			"key": "SERVER_IP",
+			"value": "103.147.92.135",
 			"type": "string"
 		},
 		{

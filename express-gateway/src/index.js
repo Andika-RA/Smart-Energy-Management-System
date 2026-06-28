@@ -10,6 +10,7 @@ const app = express();
 const port = process.env.PORT || 3060;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 app.use(globalLimiter);
 
