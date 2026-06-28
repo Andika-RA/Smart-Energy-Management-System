@@ -1,747 +1,1331 @@
 {
-	"info": {
-		"_postman_id": "8b5f39c2-5b94-4d89-a21c-5509a25b3fa2",
-		"name": "Smart City Integrated Platform",
-		"description": "Super Complete API Collection for Smart City Integrated Platform, including Gateway, OAuth 2.0 (Password, Client Credentials, Refresh Token, Introspect, Revoke), Citizen, Power, Grid, and ML Services.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Auth & System",
-			"item": [
-				{
-					"name": "Gateway Health Check",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{GATEWAY_URL}}/health",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get OAuth Token (Password Grant - Warga)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"grant_type\": \"password\",\n  \"username\": \"budi@warga.com\",\n  \"password\": \"secret\",\n  \"client_id\": \"mobile_app\",\n  \"client_secret\": \"secret\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/token",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get OAuth Token (Password Grant - Admin)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"grant_type\": \"password\",\n  \"username\": \"admin1@smartcity.com\",\n  \"password\": \"secret\",\n  \"client_id\": \"mobile_app\",\n  \"client_secret\": \"secret\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/token",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get OAuth Token (Client Credentials)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"iot_gateway\",\n  \"client_secret\": \"secret\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/token",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get OAuth Token (Refresh Token)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"grant_type\": \"refresh_token\",\n  \"refresh_token\": \"YOUR_REFRESH_TOKEN_HERE\",\n  \"client_id\": \"mobile_app\",\n  \"client_secret\": \"secret\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/token",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"token"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Introspect Token",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"token\": \"{{ACCESS_TOKEN}}\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/introspect",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"introspect"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Revoke Token",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"token\": \"{{ACCESS_TOKEN}}\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/oauth/revoke",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"oauth",
-								"revoke"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Citizen Service",
-			"item": [
-				{
-					"name": "Create Citizen (Register)",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ADMIN_TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"nik\": \"3171234567890999\",\n  \"name\": \"Erlangga Putra\",\n  \"email\": \"erlangga@warga.com\",\n  \"password\": \"password123\",\n  \"phone\": \"081299998888\",\n  \"zone_id\": 2,\n  \"role\": \"resident\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/citizens",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"citizens"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Citizen Details",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/citizens/3",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"citizens",
-								"3"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Submit Report",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"citizen_id\": 3,\n  \"category\": \"Kelistrikan\",\n  \"description\": \"Trafo meledak di tiang listrik jalan utama\",\n  \"zone_id\": 2\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/reports",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"reports"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Reports",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/reports",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"reports"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Report Status (Admin - Harus Sukses)",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ADMIN_TOKEN}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"status\": \"resolved\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/reports/1/status",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"reports",
-								"1",
-								"status"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Report Status (Resident - Harus Forbidden)",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"status\": \"resolved\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/reports/1/status",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"reports",
-								"1",
-								"status"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Power Service",
-			"item": [
-				{
-					"name": "Get Power Demands",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/power",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"power"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Record Power Demand",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"zone_id\": 2,\n  \"power_demand_kw\": 45.8\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/power",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"power"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Grid Service",
-			"item": [
-				{
-					"name": "Get Zone Infrastructure Status",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/zones",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"zones"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Record Grid Reading",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"zone_id\": 2,\n  \"voltage\": 218.4,\n  \"current\": 48.5,\n  \"power_factor\": 0.90\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/api/grid-readings",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"api",
-								"grid-readings"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "ML Service",
-			"item": [
-				{
-					"name": "Predict Power Demand",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": \"REQ-POWER-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"hour\": 14,\n  \"day_of_week\": 5,\n  \"temperature\": 32.5,\n  \"prev_demand\": 73.5,\n  \"zone\": \"Kawasan Industri A\"\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/predict/power",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"predict",
-								"power"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Predict Grid Quality",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": \"REQ-GRID-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"zone\": \"Perumahan Griya\",\n  \"voltage\": 218.4,\n  \"current\": 45.5,\n  \"power_factor\": 0.88,\n  \"temperature\": 31.0,\n  \"humidity\": 70.0\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/predict/grid-quality",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"predict",
-								"grid-quality"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Detect Anomaly",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"id\": \"REQ-ANOMALY-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"zone\": \"Pasar Tradisional\",\n  \"sensor_value\": 195.0,\n  \"timestamp_hour\": 14,\n  \"rolling_mean_1h\": 205.5,\n  \"z_score\": -2.5\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/detect/anomaly",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"detect",
-								"anomaly"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Predict Batch Power Demand",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"requests\": [\n    {\n      \"id\": \"REQ-BATCH-001\",\n      \"timestamp\": \"2026-06-27T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 32.5,\n      \"prev_demand\": 73.5,\n      \"zone\": \"Kawasan Industri A\"\n    },\n    {\n      \"id\": \"REQ-BATCH-002\",\n      \"timestamp\": \"2026-06-27T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 31.0,\n      \"prev_demand\": 8.5,\n      \"zone\": \"Perumahan Griya\"\n    }\n  ]\n}"
-						},
-						"url": {
-							"raw": "{{GATEWAY_URL}}/predict/batch",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"predict",
-								"batch"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Feature Importance",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{ACCESS_TOKEN}}"
-							}
-						],
-						"url": {
-							"raw": "{{GATEWAY_URL}}/model/feature-importance",
-							"host": [
-								"{{GATEWAY_URL}}"
-							],
-							"path": [
-								"model",
-								"feature-importance"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Direct Service Health Checks (No Gateway)",
-			"item": [
-				{
-					"name": "Citizen Service Health",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{SERVER_IP}}:8005/health",
-							"protocol": "http",
-							"host": [
-								"{{SERVER_IP}}"
-							],
-							"port": "8005",
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Grid Service Health",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{SERVER_IP}}:8015/health",
-							"protocol": "http",
-							"host": [
-								"{{SERVER_IP}}"
-							],
-							"port": "8015",
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Power Service Health",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{SERVER_IP}}:8025/health",
-							"protocol": "http",
-							"host": [
-								"{{SERVER_IP}}"
-							],
-							"port": "8025",
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "ML Service Health",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://{{SERVER_IP}}:5005/health",
-							"protocol": "http",
-							"host": [
-								"{{SERVER_IP}}"
-							],
-							"port": "5005",
-							"path": [
-								"health"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"variable": [
-		{
-			"key": "GATEWAY_URL",
-			"value": "http://103.147.92.135:3065",
-			"type": "string"
-		},
-		{
-			"key": "SERVER_IP",
-			"value": "103.147.92.135",
-			"type": "string"
-		},
-		{
-			"key": "ACCESS_TOKEN",
-			"value": "your_access_token_here",
-			"type": "string"
-		},
-		{
-			"key": "ADMIN_TOKEN",
-			"value": "your_admin_token_here",
-			"type": "string"
-		}
-	]
+  "info": {
+    "_postman_id": "8b5f39c2-5b94-4d89-a21c-5509a25b3fa2",
+    "name": "Smart City Integrated Platform",
+    "description": "Super Complete API Collection untuk Smart City Integrated Platform: Gateway, OAuth 2.0 (Password, Client Credentials, Refresh Token, Introspect, Revoke), Citizen, Power, Grid, dan ML Service.\n\nDisesuaikan dengan kondisi repo terbaru (proxy gateway sudah memakai pathRewrite + fixRequestBody, login warga memverifikasi password ber-hash bcrypt, refresh_token grant sudah berfungsi).\n\nFITUR OTOMATIS:\n- Setiap request login (Password Grant Warga/Admin, Client Credentials) otomatis menyimpan access_token & refresh_token ke collection variable lewat Tests script.\n- Pre-request Script di level COLLECTION (bukan per-request) otomatis memeriksa apakah token sudah/akan kedaluwarsa sebelum SETIAP request lain dikirim, dan kalau iya, otomatis memanggil grant_type=refresh_token lebih dulu tanpa perlu login ulang manual.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// ============================================================================",
+          "// AUTO-REFRESH TOKEN — jalan otomatis SEBELUM setiap request di collection ini.",
+          "// Kalau access token (warga/admin/service) sudah/akan kedaluwarsa, script ini",
+          "// memanggil grant_type=refresh_token ke gateway terlebih dahulu dan menyimpan",
+          "// token baru ke collection variable, sebelum request aslinya benar-benar dikirim.",
+          "// ============================================================================",
+          "",
+          "const AUTH_PATHS = [\"/oauth/token\", \"/oauth/introspect\", \"/oauth/revoke\"];",
+          "const currentUrl = pm.request.url.toString();",
+          "const isAuthRequest = AUTH_PATHS.some(function (p) { return currentUrl.indexOf(p) !== -1; });",
+          "",
+          "if (!isAuthRequest) {",
+          "    refreshIfNeeded(\"ACCESS_TOKEN\", \"REFRESH_TOKEN\", \"TOKEN_EXPIRES_AT\", pm.collectionVariables.get(\"CLIENT_ID\"), pm.collectionVariables.get(\"CLIENT_SECRET\"));",
+          "    refreshIfNeeded(\"ADMIN_TOKEN\", \"ADMIN_REFRESH_TOKEN\", \"ADMIN_TOKEN_EXPIRES_AT\", pm.collectionVariables.get(\"ADMIN_CLIENT_ID\"), pm.collectionVariables.get(\"CLIENT_SECRET\"));",
+          "    refreshIfNeeded(\"SERVICE_TOKEN\", \"SERVICE_REFRESH_TOKEN\", \"SERVICE_TOKEN_EXPIRES_AT\", pm.collectionVariables.get(\"IOT_CLIENT_ID\"), pm.collectionVariables.get(\"IOT_CLIENT_SECRET\"));",
+          "}",
+          "",
+          "function refreshIfNeeded(accessKey, refreshKey, expiryKey, clientId, clientSecret) {",
+          "    const refreshToken = pm.collectionVariables.get(refreshKey);",
+          "    const expiresAt = parseInt(pm.collectionVariables.get(expiryKey) || \"0\", 10);",
+          "    const BUFFER_MS = 15000; // refresh 15 detik sebelum benar-benar expired",
+          "",
+          "    if (!refreshToken) return; // belum pernah login lewat flow ini, biarkan apa adanya",
+          "    if (Date.now() < expiresAt - BUFFER_MS) return; // token masih cukup valid, tidak perlu refresh",
+          "",
+          "    const gatewayUrl = pm.collectionVariables.get(\"GATEWAY_URL\");",
+          "",
+          "    pm.sendRequest({",
+          "        url: gatewayUrl + \"/oauth/token\",",
+          "        method: \"POST\",",
+          "        header: { \"Content-Type\": \"application/json\" },",
+          "        body: {",
+          "            mode: \"raw\",",
+          "            raw: JSON.stringify({",
+          "                grant_type: \"refresh_token\",",
+          "                refresh_token: refreshToken,",
+          "                client_id: clientId,",
+          "                client_secret: clientSecret",
+          "            })",
+          "        }",
+          "    }, function (err, res) {",
+          "        if (err) {",
+          "            console.error(\"\\u274c Auto-refresh \" + accessKey + \" gagal (network):\", err);",
+          "            return;",
+          "        }",
+          "        let json;",
+          "        try { json = res.json(); } catch (e) { json = null; }",
+          "",
+          "        if (json && json.status === \"success\" && json.data && json.data.access_token) {",
+          "            pm.collectionVariables.set(accessKey, json.data.access_token);",
+          "            pm.collectionVariables.set(refreshKey, json.data.refresh_token);",
+          "            pm.collectionVariables.set(expiryKey, String(Date.now() + (json.data.expires_in * 1000)));",
+          "            console.log(\"\\ud83d\\udd04 \" + accessKey + \" berhasil di-refresh otomatis.\");",
+          "        } else {",
+          "            console.warn(\"\\u26a0\\ufe0f Auto-refresh \" + accessKey + \" ditolak server (refresh token mungkin sudah kedaluwarsa). Silakan login ulang manual.\", json);",
+          "        }",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth & System",
+      "item": [
+        {
+          "name": "Gateway Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/health",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Server Health (Direct)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{SERVER_IP}}:3005/health",
+              "protocol": "http",
+              "host": [
+                "{{SERVER_IP}}"
+              ],
+              "port": "3005",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get OAuth Token (Password Grant - Warga)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/oauth/token",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "oauth",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"password\",\n  \"username\": \"budi@warga.com\",\n  \"password\": \"password\",\n  \"client_id\": \"{{CLIENT_ID}}\",\n  \"client_secret\": \"{{CLIENT_SECRET}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Simpan token secara otomatis dari response login.",
+                  "let json;",
+                  "try { json = pm.response.json(); } catch (e) { json = null; }",
+                  "",
+                  "pm.test(\"Login Warga: status code 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (json && json.status === \"success\" && json.data && json.data.access_token) {",
+                  "    pm.collectionVariables.set(\"ACCESS_TOKEN\", json.data.access_token);",
+                  "    pm.collectionVariables.set(\"REFRESH_TOKEN\", json.data.refresh_token);",
+                  "    pm.collectionVariables.set(\"TOKEN_EXPIRES_AT\", String(Date.now() + (json.data.expires_in * 1000)));",
+                  "    console.log(\"\\u2705 ACCESS_TOKEN tersimpan otomatis (berlaku \" + json.data.expires_in + \" detik).\");",
+                  "} else {",
+                  "    console.warn(\"\\u26a0\\ufe0f Login gagal, ACCESS_TOKEN TIDAK diperbarui. Cek response di tab Body.\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get OAuth Token (Password Grant - Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/oauth/token",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "oauth",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"password\",\n  \"username\": \"admin1@smartcity.com\",\n  \"password\": \"password\",\n  \"client_id\": \"{{ADMIN_CLIENT_ID}}\",\n  \"client_secret\": \"{{CLIENT_SECRET}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Simpan token secara otomatis dari response login.",
+                  "let json;",
+                  "try { json = pm.response.json(); } catch (e) { json = null; }",
+                  "",
+                  "pm.test(\"Login Admin: status code 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (json && json.status === \"success\" && json.data && json.data.access_token) {",
+                  "    pm.collectionVariables.set(\"ADMIN_TOKEN\", json.data.access_token);",
+                  "    pm.collectionVariables.set(\"ADMIN_REFRESH_TOKEN\", json.data.refresh_token);",
+                  "    pm.collectionVariables.set(\"ADMIN_TOKEN_EXPIRES_AT\", String(Date.now() + (json.data.expires_in * 1000)));",
+                  "    console.log(\"\\u2705 ADMIN_TOKEN tersimpan otomatis (berlaku \" + json.data.expires_in + \" detik).\");",
+                  "} else {",
+                  "    console.warn(\"\\u26a0\\ufe0f Login gagal, ADMIN_TOKEN TIDAK diperbarui. Cek response di tab Body.\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get OAuth Token (Client Credentials - IoT Gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/oauth/token",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "oauth",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"client_id\": \"{{IOT_CLIENT_ID}}\",\n  \"client_secret\": \"{{IOT_CLIENT_SECRET}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Simpan token secara otomatis dari response login.",
+                  "let json;",
+                  "try { json = pm.response.json(); } catch (e) { json = null; }",
+                  "",
+                  "pm.test(\"Client Credentials: status code 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (json && json.status === \"success\" && json.data && json.data.access_token) {",
+                  "    pm.collectionVariables.set(\"SERVICE_TOKEN\", json.data.access_token);",
+                  "    pm.collectionVariables.set(\"SERVICE_REFRESH_TOKEN\", json.data.refresh_token);",
+                  "    pm.collectionVariables.set(\"SERVICE_TOKEN_EXPIRES_AT\", String(Date.now() + (json.data.expires_in * 1000)));",
+                  "    console.log(\"\\u2705 SERVICE_TOKEN tersimpan otomatis (berlaku \" + json.data.expires_in + \" detik).\");",
+                  "} else {",
+                  "    console.warn(\"\\u26a0\\ufe0f Login gagal, SERVICE_TOKEN TIDAK diperbarui. Cek response di tab Body.\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get OAuth Token (Refresh Token - manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/oauth/token",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "oauth",
+                "token"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grant_type\": \"refresh_token\",\n  \"refresh_token\": \"{{REFRESH_TOKEN}}\",\n  \"client_id\": \"{{CLIENT_ID}}\",\n  \"client_secret\": \"{{CLIENT_SECRET}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Catatan: refresh otomatis SUDAH berjalan sendiri lewat Pre-request Script di level",
+                  "// collection begitu token mendekati expired. Request ini hanya untuk demo manual.",
+                  "",
+                  "// Simpan token secara otomatis dari response login.",
+                  "let json;",
+                  "try { json = pm.response.json(); } catch (e) { json = null; }",
+                  "",
+                  "pm.test(\"Refresh Token (manual): status code 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "if (json && json.status === \"success\" && json.data && json.data.access_token) {",
+                  "    pm.collectionVariables.set(\"ACCESS_TOKEN\", json.data.access_token);",
+                  "    pm.collectionVariables.set(\"REFRESH_TOKEN\", json.data.refresh_token);",
+                  "    pm.collectionVariables.set(\"TOKEN_EXPIRES_AT\", String(Date.now() + (json.data.expires_in * 1000)));",
+                  "    console.log(\"\\u2705 ACCESS_TOKEN tersimpan otomatis (berlaku \" + json.data.expires_in + \" detik).\");",
+                  "} else {",
+                  "    console.warn(\"\\u26a0\\ufe0f Login gagal, ACCESS_TOKEN TIDAK diperbarui. Cek response di tab Body.\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Introspect Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/oauth/introspect",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "oauth",
+                "introspect"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{ACCESS_TOKEN}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Introspect berhasil dipanggil (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/oauth/revoke",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "oauth",
+                "revoke"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{ACCESS_TOKEN}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Revoke berhasil dipanggil (200)\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "// Token yang baru saja di-revoke sudah tidak valid -- bersihkan variable supaya",
+                  "// auto-refresh tidak mencoba memakainya lagi.",
+                  "pm.collectionVariables.set(\"ACCESS_TOKEN\", \"\");",
+                  "pm.collectionVariables.set(\"REFRESH_TOKEN\", \"\");",
+                  "pm.collectionVariables.set(\"TOKEN_EXPIRES_AT\", \"0\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Citizen Service",
+      "item": [
+        {
+          "name": "Create Citizen (Register)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/citizens",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "citizens"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nik\": \"3171234567890999\",\n  \"name\": \"Erlangga Putra\",\n  \"email\": \"erlangga@warga.com\",\n  \"password\": \"password123\",\n  \"phone\": \"081299998888\",\n  \"zone_id\": 2,\n  \"role\": \"resident\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Citizen Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/citizens/3",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "citizens",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/reports",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "reports"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citizen_id\": 3,\n  \"category\": \"Kelistrikan\",\n  \"description\": \"Trafo meledak di tiang listrik jalan utama\",\n  \"zone_id\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/reports",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "reports"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Report Status (Admin - Harus Sukses)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ADMIN_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/reports/1/status",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "1",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Report Status (Resident - Harus Forbidden)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/reports/1/status",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "1",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"resolved\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/notifications",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Power Service",
+      "item": [
+        {
+          "name": "Get Power Demands",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/power",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "power"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Record Power Demand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/power",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "power"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zone_id\": 2,\n  \"power_demand_kw\": 45.8\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Weather Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/weather",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "weather"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Record Weather Log",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/weather",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "weather"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zone_id\": 2,\n  \"temperature\": 31.5,\n  \"humidity\": 68\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Forecasts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/forecast",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "forecast"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Forecast",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/forecast",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "forecast"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zone_id\": 2,\n  \"predicted_demand_kw\": 52.3,\n  \"status_level\": \"Normal\",\n  \"forecast_for_time\": \"2026-06-29 08:00:00\",\n  \"model_version\": \"RandomForest_v1.0\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Grid Service",
+      "item": [
+        {
+          "name": "Get Zone Infrastructure Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/zones",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "zones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Record Grid Reading",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/grid-readings",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "grid-readings"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zone_id\": 2,\n  \"voltage\": 218.4,\n  \"current\": 48.5,\n  \"power_factor\": 0.9\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Grid Incidents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/grid-incidents",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "grid-incidents"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Report Grid Incident",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/api/grid-incidents",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "api",
+                "grid-incidents"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"zone_id\": 2,\n  \"type\": \"overload\",\n  \"severity\": \"high\",\n  \"status\": \"open\",\n  \"description\": \"Trafo overload akibat lonjakan beban\",\n  \"reported_at\": \"2026-06-29 08:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ML Service",
+      "item": [
+        {
+          "name": "Predict Power Demand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/predict/power",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "predict",
+                "power"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"REQ-POWER-001\",\n  \"timestamp\": \"2026-06-29T12:00:00Z\",\n  \"hour\": 14,\n  \"day_of_week\": 5,\n  \"temperature\": 32.5,\n  \"prev_demand\": 73.5,\n  \"zone\": \"Kawasan Industri A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Predict Grid Quality",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/predict/grid-quality",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "predict",
+                "grid-quality"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"REQ-GRID-001\",\n  \"timestamp\": \"2026-06-29T12:00:00Z\",\n  \"zone\": \"Perumahan Griya\",\n  \"voltage\": 218.4,\n  \"current\": 45.5,\n  \"power_factor\": 0.88,\n  \"temperature\": 31.0,\n  \"humidity\": 70.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detect Anomaly",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/detect/anomaly",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "detect",
+                "anomaly"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"REQ-ANOMALY-001\",\n  \"timestamp\": \"2026-06-29T12:00:00Z\",\n  \"zone\": \"Pasar Tradisional\",\n  \"sensor_value\": 195.0,\n  \"timestamp_hour\": 14,\n  \"rolling_mean_1h\": 205.5,\n  \"z_score\": -2.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Predict Batch Power Demand",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/predict/batch",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "predict",
+                "batch"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"requests\": [\n    {\n      \"id\": \"REQ-BATCH-001\",\n      \"timestamp\": \"2026-06-29T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 32.5,\n      \"prev_demand\": 73.5,\n      \"zone\": \"Kawasan Industri A\"\n    },\n    {\n      \"id\": \"REQ-BATCH-002\",\n      \"timestamp\": \"2026-06-29T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 31.0,\n      \"prev_demand\": 8.5,\n      \"zone\": \"Perumahan Griya\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Feature Importance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{ACCESS_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY_URL}}/model/feature-importance",
+              "host": [
+                "{{GATEWAY_URL}}"
+              ],
+              "path": [
+                "model",
+                "feature-importance"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Direct Service Health Checks (No Gateway)",
+      "item": [
+        {
+          "name": "Citizen Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{SERVER_IP}}:8005/health",
+              "protocol": "http",
+              "host": [
+                "{{SERVER_IP}}"
+              ],
+              "port": "8005",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Grid Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{SERVER_IP}}:8015/health",
+              "protocol": "http",
+              "host": [
+                "{{SERVER_IP}}"
+              ],
+              "port": "8015",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Power Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{SERVER_IP}}:8025/health",
+              "protocol": "http",
+              "host": [
+                "{{SERVER_IP}}"
+              ],
+              "port": "8025",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ML Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{SERVER_IP}}:5005/health",
+              "protocol": "http",
+              "host": [
+                "{{SERVER_IP}}"
+              ],
+              "port": "5005",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Server Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://{{SERVER_IP}}:3005/health",
+              "protocol": "http",
+              "host": [
+                "{{SERVER_IP}}"
+              ],
+              "port": "3005",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "GATEWAY_URL",
+      "value": "http://103.147.92.135:3065",
+      "type": "string"
+    },
+    {
+      "key": "SERVER_IP",
+      "value": "103.147.92.135",
+      "type": "string"
+    },
+    {
+      "key": "CLIENT_ID",
+      "value": "mobile_app",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_CLIENT_ID",
+      "value": "web_admin",
+      "type": "string"
+    },
+    {
+      "key": "IOT_CLIENT_ID",
+      "value": "iot_gateway",
+      "type": "string"
+    },
+    {
+      "key": "CLIENT_SECRET",
+      "value": "password",
+      "type": "string"
+    },
+    {
+      "key": "IOT_CLIENT_SECRET",
+      "value": "password",
+      "type": "string"
+    },
+    {
+      "key": "ACCESS_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "REFRESH_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN_EXPIRES_AT",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_REFRESH_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ADMIN_TOKEN_EXPIRES_AT",
+      "value": "0",
+      "type": "string"
+    },
+    {
+      "key": "SERVICE_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "SERVICE_REFRESH_TOKEN",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "SERVICE_TOKEN_EXPIRES_AT",
+      "value": "0",
+      "type": "string"
+    }
+  ]
 }
