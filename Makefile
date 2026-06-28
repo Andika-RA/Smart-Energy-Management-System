@@ -31,14 +31,30 @@ logs:
 
 # === KUBERNETES COMMANDS ===
 k8s-deploy:
-	@echo "${GREEN}Membangun image langsung di dalam Minikube...${NC}"
-	@eval $$(minikube docker-env) && docker compose build
+	@echo "${GREEN}Membangun image Docker lokal...${NC}"
+	docker compose build
+	@echo "${GREEN}Men-tag image agar sesuai dengan manifest...${NC}"
+	docker tag smart-energy-management-system-api-gateway:latest smart-city-platform-api-gateway:latest
+	docker tag smart-energy-management-system-citizen-service:latest smart-city-platform-php-citizen:latest
+	docker tag smart-energy-management-system-grid-service:latest smart-city-platform-php-grid:latest
+	docker tag smart-energy-management-system-power-service:latest smart-city-platform-php-power:latest
+	docker tag smart-energy-management-system-oauth-server:latest smart-city-platform-oauth-server:latest
+	docker tag smart-energy-management-system-python-ml:latest smart-city-platform-python-ml:latest
+	@echo "${GREEN}Mengimpor image ke kluster k3d...${NC}"
+	k3d image import \
+		smart-city-platform-api-gateway:latest \
+		smart-city-platform-php-citizen:latest \
+		smart-city-platform-php-grid:latest \
+		smart-city-platform-php-power:latest \
+		smart-city-platform-oauth-server:latest \
+		smart-city-platform-python-ml:latest \
+		-c smartplatform
 	@echo "${GREEN}Men-deploy arsitektur ke kluster Kubernetes...${NC}"
 	kubectl apply -f k8s/
 
 k8s-status:
-	@echo "${GREEN}Mengecek status kluster (Namespace: smartcity-platform)...${NC}"
-	kubectl get pods,svc,hpa,ingress -n smartcity-platform
+	@echo "${GREEN}Mengecek status kluster (Namespace: smartcity-energy-management-system)...${NC}"
+	kubectl get pods,svc,hpa,ingress -n smartcity-energy-management-system
 
 k8s-down:
 	@echo "${GREEN}Menghapus seluruh arsitektur dari kluster Kubernetes...${NC}"
