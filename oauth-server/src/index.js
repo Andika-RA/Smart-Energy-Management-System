@@ -207,6 +207,8 @@ app.post("/oauth/token", async (req, res) => {
     return sendResponse(res, "error", 400, null, "Unsupported grant type");
   }
 
+  // Add unique JWT ID (jti) to prevent duplicate access_token strings in DB when generated in the same second
+  payload.jti = crypto.randomBytes(16).toString("hex");
   const access_token = jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
   const refresh_token = crypto.randomBytes(40).toString("hex");
 
