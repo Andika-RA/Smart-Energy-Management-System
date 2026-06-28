@@ -40,17 +40,27 @@ k8s-deploy:
 	docker tag smart-energy-management-system-power-service:latest smart-city-platform-php-power:latest
 	docker tag smart-energy-management-system-oauth-server:latest smart-city-platform-oauth-server:latest
 	docker tag smart-energy-management-system-python-ml:latest smart-city-platform-python-ml:latest
-	@echo "${GREEN}Mengimpor image ke kluster k3d...${NC}"
-	k3d image import \
+	@echo "${GREEN}Mengompresi image ke tarball...${NC}"
+	docker save -o smartcity-images.tar \
 		smart-city-platform-api-gateway:latest \
 		smart-city-platform-php-citizen:latest \
 		smart-city-platform-php-grid:latest \
 		smart-city-platform-php-power:latest \
 		smart-city-platform-oauth-server:latest \
-		smart-city-platform-python-ml:latest \
-		-c smartplatform
-	@echo "${GREEN}Men-deploy arsitektur ke kluster Kubernetes...${NC}"
+		smart-city-platform-python-ml:latest
+	@echo "${GREEN}Menyalin tarball ke container k3d...${NC}"
+	docker cp smartcity-images.tar k3d-smartplatform-server-0:/tmp/smartcity-images.tar
+	@echo "${GREEN}Mengimpor image langsung ke containerd namespace k8s.io...${NC}"
+	docker exec -i k3d-smartplatform-server-0 ctr -n k8s.io images import /tmp/smartcity-images.tar
+	@echo "${GREEN}Membersihkan tarball sementara...${NC}"
+	docker exec -it k3d-smartplatform-server-0 rm -f /tmp/smartcity-images.tar
+	rm -f smartcity-images.tar
+	@echo "${GREEN}Menyusun namespace terlebih dahulu...${NC}"
+	kubectl apply -f k8s/namespace.yaml
+	@echo "${GREEN}Men-deploy seluruh arsitektur ke Kubernetes...${NC}"
 	kubectl apply -f k8s/
+	@echo "${GREEN}Memaksa pod melakukan restart agar menggunakan image baru...${NC}"
+	kubectl delete pods --all -n smartcity-energy-management-system
 
 k8s-status:
 	@echo "${GREEN}Mengecek status kluster (Namespace: smartcity-energy-management-system)...${NC}"
