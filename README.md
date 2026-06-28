@@ -142,14 +142,5 @@ Berikut adalah daftar endpoint utama yang diekspos melalui API Gateway:
 Seluruh pengujian fungsionalitas sistem (skenario E2E mulai dari ingesti data IoT, autentikasi OAuth 2.0 dengan Bcrypt, verifikasi JWT lokal di Gateway, validasi role RBAC, inferensi ML real-time, hingga pengiriman notifikasi anomali secara asinkron) dapat langsung dicoba menggunakan file koleksi API Postman:
 * **`database/smartcity_platform.postman_collection.json`**
 
-### Skenario Uji Komprehensif:
-
-*   **Skenario S1 (Verifikasi Fungsionalitas Lokal / Mode Development):**
-    Pengujian port lokal, pemanggilan service langsung tanpa kontainer, dan pengisian awal database untuk memastikan mode development berjalan stabil.
-*   **Skenario S2 (Pendaftaran Citizen & Pelaporan Masalah):**
-    Menguji alur keamanan token OAuth 2.0 (password, client credentials, refresh token), verifikasi signature JWT lokal di Gateway, pembatasan hak akses berbasis peran (RBAC), serta asinkronisasi pengiriman event laporan warga via RabbitMQ.
-*   **Skenario S4 (Pengujian Integrasi Docker Compose & IoT Pipeline):**
-    Melakukan deployment seluruh layanan secara modular menggunakan Docker Compose. Menguji aliran data sensor IoT real-time dari simulator Wokwi ESP32 via MQTT Mosquitto, konversi payload oleh Node-RED ke RabbitMQ, serta penyimpanan data pembacaan sensor ke MySQL.
-*   **Skenario S5 (Pengujian Kubernetes & Ketahanan Sistem):**
-    Mendeploy seluruh manifest Kubernetes ke kluster k3d/Minikube. Melakukan pengujian akses Gateway via NodePort, pengujian Horizontal Pod Autoscaler (HPA) saat terjadi lonjakan CPU di Python ML Service, serta pembuktian zero-downtime rolling update saat dilakukan pembaruan (rollout restart) API Gateway.
+Silakan import file koleksi tersebut ke dalam aplikasi Postman untuk memulai simulasi pengujian lengkap.
 
