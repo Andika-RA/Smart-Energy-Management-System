@@ -55,7 +55,7 @@ void setup() {
   setup_wifi();
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   Serial.println("Sinkronisasi waktu...");
-  client.setServer(mqtt_server, 1883);
+  client.setServer(mqtt_server, SECRET_MQTT_PORT);
 }
 
 void loop() {
