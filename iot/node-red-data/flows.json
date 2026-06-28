@@ -59,7 +59,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://api-gateway:3000/oauth/token",
+        "url": "http://api-gateway:3060/oauth/token",
         "x": 520,
         "y": 100,
         "wires": [
@@ -91,7 +91,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://api-gateway:3000/api/grid-readings",
+        "url": "http://api-gateway:3060/api/grid-readings",
         "x": 1000,
         "y": 100,
         "wires": [
@@ -153,7 +153,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://api-gateway:3000/oauth/token",
+        "url": "http://api-gateway:3060/oauth/token",
         "x": 520,
         "y": 200,
         "wires": [
@@ -185,7 +185,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://api-gateway:3000/api/power",
+        "url": "http://api-gateway:3060/api/power",
         "x": 980,
         "y": 200,
         "wires": [
@@ -247,7 +247,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://api-gateway:3000/oauth/token",
+        "url": "http://api-gateway:3060/oauth/token",
         "x": 520,
         "y": 300,
         "wires": [
@@ -279,7 +279,7 @@
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
-        "url": "http://api-gateway:3000/detect/anomaly",
+        "url": "http://api-gateway:3060/detect/anomaly",
         "x": 990,
         "y": 300,
         "wires": [

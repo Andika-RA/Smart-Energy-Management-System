@@ -33,112 +33,128 @@ function registerProxyRoutes(app) {
     target: services.oauth,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: fixRequestBody, error: proxyErrorHandler }
+    onProxyReq: fixRequestBody,
+    onError: proxyErrorHandler
   }));
 
   app.patch("/api/reports/:id/status", authLimiter, authMiddleware, adminMiddleware, createProxyMiddleware({
     target: services.citizen,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/citizens", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.citizen,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/reports", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.citizen,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/notifications", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.citizen,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/power", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.power,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/weather", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.power,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/forecast", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.power,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/grid", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.grid,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/zones", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.grid,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/grid-readings", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.grid,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/grid-quality", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.grid,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/api/grid-incidents", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.grid,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/predict", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.ml,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/detect", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.ml,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 
   app.use("/model", authLimiter, authMiddleware, createProxyMiddleware({
     target: services.ml,
     changeOrigin: true,
     pathRewrite: preserveFullPath,
-    on: { proxyReq: onProxyReqCombined, error: proxyErrorHandler }
+    onProxyReq: onProxyReqCombined,
+    onError: proxyErrorHandler
   }));
 }
 
