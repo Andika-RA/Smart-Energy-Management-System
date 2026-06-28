@@ -12,7 +12,7 @@ services:
   # ── INFRASTRUKTUR UTAMA ──────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
-    container_name: smartcity-mysql
+    container_name: Smart-Energy-Management-System-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASS}
       MYSQL_DATABASE: ${DB_NAME}
@@ -29,7 +29,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.12-management
-    container_name: smartcity-rabbitmq
+    container_name: Smart-Energy-Management-System-rabbitmq
     ports:
       - "5675:5672"   
       - "15675:15672"
@@ -40,7 +40,7 @@ services:
   
   mosquitto:
     image: eclipse-mosquitto:2.0
-    container_name: smartcity-mosquitto
+    container_name: Smart-Energy-Management-System-mosquitto
     ports: 
       - "1885:1883"
     volumes: 
@@ -51,7 +51,7 @@ services:
   # ── MICROSERVICES CORE ───────────────────────────────────────────────────
   oauth-server:
     build: ./oauth-server
-    container_name: smartcity-oauth
+    container_name: Smart-Energy-Management-System-oauth
     ports: ["3005:3002"]
     environment:
       - JWT_SECRET=${JWT_SECRET}
@@ -67,7 +67,7 @@ services:
 
   api-gateway:
     build: ./express-gateway
-    container_name: smartcity-gateway
+    container_name: Smart-Energy-Management-System-gateway
     ports: 
       - "3065:3060"
     environment:
@@ -86,7 +86,7 @@ services:
  
   citizen-service:
     build: ./php-citizen
-    container_name: smartcity-citizen
+    container_name: Smart-Energy-Management-System-citizen
     ports:
       - "8005:80"
     environment:
@@ -103,7 +103,7 @@ services:
   
   grid-service:
     build: ./php-grid
-    container_name: smartcity-grid
+    container_name: Smart-Energy-Management-System-grid
     ports:
       - "8015:80"
     environment:
@@ -120,7 +120,7 @@ services:
 
   power-service:
     build: ./php-power
-    container_name: smartcity-power
+    container_name: Smart-Energy-Management-System-power
     ports:
       - "8025:80"
     environment: 
@@ -137,7 +137,7 @@ services:
   
   citizen-worker:
     build: ./php-citizen
-    container_name: smartcity-citizen-worker
+    container_name: Smart-Energy-Management-System-citizen-worker
     command: ["php", "public/worker.php"]
     environment:
       - DB_HOST=${DB_HOST}
@@ -156,7 +156,7 @@ services:
   # ── AI & IOT LAYER ───────────────────────────────────────────────────────
   python-ml:
     build: ./python-ml-service
-    container_name: smartcity-python-ml
+    container_name: Smart-Energy-Management-System-python-ml
     ports:
       - "5005:5000"
     environment: 
@@ -168,7 +168,7 @@ services:
  
   node-red:
     image: nodered/node-red:3.1
-    container_name: smartcity-nodered
+    container_name: Smart-Energy-Management-System-nodered
     ports: 
       - "1888:1880"
     volumes: 
@@ -178,7 +178,7 @@ services:
 
   iot-simulator:
     build: ./iot
-    container_name: smartcity-iot-monitor
+    container_name: Smart-Energy-Management-System-iot-monitor
     env_file: .env
     depends_on:
       - mosquitto
@@ -188,7 +188,7 @@ services:
   # ── MONITORING ─────────────────────────────────────────────────────────────
   prometheus:
     image: prom/prometheus:v2.48.0
-    container_name: smartcity-prometheus
+    container_name: Smart-Energy-Management-System-prometheus
     ports: 
       - "9095:9090"
     volumes: 
@@ -198,7 +198,7 @@ services:
  
   grafana:
     image: grafana/grafana:10.2.0
-    container_name: smartcity-grafana
+    container_name: Smart-Energy-Management-System-grafana
     ports: 
       - "3015:3000"
     environment:
