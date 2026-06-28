@@ -5,12 +5,17 @@ import joblib
 import numpy as np
 from datetime import datetime
 import os
+from prometheus_client import make_asgi_app, Counter
 
 app = FastAPI(
     title="Smart Energy ML Service", 
     version="1.0", 
     description="Power Demand, Grid Quality & Anomaly Prediction"
 )
+
+anomaly_detections_total = Counter('anomaly_detections_total', 'Total Deteksi Anomali Fisik', ['job'])
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 MODEL_PATH = "models/smartcity_models.pkl"
 try:
@@ -110,6 +115,10 @@ def detect_anomaly(d: SensorIn):
     X = b['scaler'].transform([[d.sensor_value, d.timestamp_hour, d.rolling_mean_1h, d.z_score]])
     score = float(b['model'].score_samples(X)[0])
     is_anom = score < -0.1
+    
+    if is_anom:
+        anomaly_detections_total.labels(job='python-ml').inc()
+
     data = {
         "id": d.id,
         "timestamp": d.timestamp,
