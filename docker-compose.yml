@@ -71,6 +71,7 @@ services:
     ports: 
       - "3065:3060"
     environment:
+      - PORT=3060
       - JWT_SECRET=${JWT_SECRET}
       - OAUTH_SERVER_URL=http://oauth-server:3002
       - CITIZEN_SERVICE_URL=http://citizen-service:80
