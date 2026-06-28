@@ -1,9 +1,23 @@
 const rateLimit = require("express-rate-limit");
 
+const isPrivateIP = (ip) => {
+  return (
+    ip === "127.0.0.1" ||
+    ip === "::1" ||
+    ip.includes("172.") ||
+    ip.includes("192.168.") ||
+    ip.includes("10.")
+  );
+};
+
 // Global rate limit per IP
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 menit
   max: 100,
+  skip: (req) => {
+    const ip = req.ip || "";
+    return isPrivateIP(ip);
+  },
   standardHeaders: true,
   legacyHeaders: false,
   message: {
