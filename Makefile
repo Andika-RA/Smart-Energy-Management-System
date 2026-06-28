@@ -31,13 +31,15 @@ logs:
 
 # === KUBERNETES COMMANDS ===
 k8s-deploy:
+	@echo "${GREEN}Membangun image langsung di dalam Minikube...${NC}"
+	@eval $$(minikube docker-env) && docker compose build
 	@echo "${GREEN}Men-deploy arsitektur ke kluster Kubernetes...${NC}"
 	kubectl apply -f k8s/
 
 k8s-status:
-	@echo "${GREEN}Status komponen di namespace smartcity-platform:${NC}"
-	kubectl get all -n smartcity-platform
+	@echo "${GREEN}Mengecek status kluster (Namespace: smartcity-platform)...${NC}"
+	kubectl get pods,svc,hpa,ingress -n smartcity-platform
 
 k8s-down:
-	@echo "${GREEN}Menghapus deployment dari Kubernetes...${NC}"
+	@echo "${GREEN}Menghapus seluruh arsitektur dari kluster Kubernetes...${NC}"
 	kubectl delete -f k8s/
