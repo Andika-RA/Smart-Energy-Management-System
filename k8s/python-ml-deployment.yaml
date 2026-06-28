@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: python-ml
-  namespace: smartcity-platform
+  namespace: smartcity-energy-management-system
 spec:
   replicas: 1
   selector:
@@ -34,12 +34,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: python-ml
-  namespace: smartcity-platform
+  namespace: smartcity-energy-management-system
 spec:
   selector:
     app: python-ml
   ports:
     - port: 5000
       targetPort: 5000
-      nodePort: 30500
+      nodePort: 30005
   type: NodePort
