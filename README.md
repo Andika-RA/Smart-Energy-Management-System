@@ -1,15 +1,15 @@
-# Tugas Besar UAS - Rekayasa Perangkat Lunak 2 (SE.2)
-## Sistem Smart Energy & Power Grid - Kelompok 5
+# Tugas Besar UAS - Pembangunan Perangkat Lunak Orientasi Berbasis Service (SE.2)
+## Smart Energy Management System - Kelompok 5
 
-Repository ini dibuat untuk memenuhi tugas besar UAS mata kuliah Rekayasa Perangkat Lunak 2 (SE.2) kelas A, S1 Informatika. Sistem yang dibangun adalah platform manajemen energi pintar (Smart Energy & Power Grid) berbasis microservices. 
+Repository ini dibuat untuk memenuhi Tugas Besar UAS mata kuliah **Pembangunan Perangkat Lunak Orientasi Berbasis Service (SE.2)** kelas A, S1 Informatika.
 
-Sistem ini terintegrasi menggunakan API Gateway, OAuth 2.0 Authorization Server, PHP MVC Service (Citizen, Power, Grid), Python ML Service (FastAPI) untuk prediksi beban daya & anomali, serta pipeline IoT berbasis MQTT dan Node-RED.
+Sistem yang dibangun adalah **Smart Energy Management System** berbasis arsitektur microservices, mencakup API Gateway, OAuth 2.0 Authorization Server, tiga layanan PHP MVC (Citizen, Power, Grid), Python ML Service (FastAPI) untuk prediksi beban daya & deteksi anomali, serta pipeline IoT berbasis MQTT dan Node-RED.
 
 ---
 
 ## Detail Kelompok 5
 
-* **Mata Kuliah**: Rekayasa Perangkat Lunak 2 (SE.2 - A)
+* **Mata Kuliah**: Pembangunan Perangkat Lunak Orientasi Berbasis Service (SE.2 - A)
 * **Dosen Pengampu**: Muhammad Panji Muslim, S.Pd., M.Kom.
 * **Program Studi**: S1 Informatika
 

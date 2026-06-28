@@ -120,6 +120,7 @@ Thumbs.db
 .vscode/
 .idea/
 *.iml
+.agents/
 
 # ==========================================
 # TEMP FILES
@@ -129,6 +130,3 @@ temp/
 *.tmp
 *.swp
 *.swo
-
-# AGENT METADATA
-.agents/

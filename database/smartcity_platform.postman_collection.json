@@ -34,7 +34,7 @@
 								},
 								{
 									"key": "password",
-									"value": "rootpass",
+									"value": "secret",
 									"type": "text"
 								},
 								{
@@ -228,12 +228,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8001/health",
+							"raw": "http://localhost:8000/health",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8001",
+							"port": "8000",
 							"path": [
 								"health"
 							]
@@ -384,12 +384,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8003/health",
+							"raw": "http://localhost:8001/health",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8003",
+							"port": "8001",
 							"path": [
 								"health"
 							]
@@ -410,6 +410,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
 							}
 						],
 						"body": {
@@ -417,12 +421,10 @@
 							"raw": "{\n  \"id\": \"REQ-POWER-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"hour\": 14,\n  \"day_of_week\": 5,\n  \"temperature\": 32.5,\n  \"prev_demand\": 73.5,\n  \"zone\": \"Kawasan Industri A\"\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8000/predict/power",
-							"protocol": "http",
+							"raw": "{{GATEWAY_URL}}/predict/power",
 							"host": [
-								"localhost"
+								"{{GATEWAY_URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"predict",
 								"power"
@@ -439,6 +441,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
 							}
 						],
 						"body": {
@@ -446,12 +452,10 @@
 							"raw": "{\n  \"id\": \"REQ-GRID-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"zone\": \"Perumahan Griya\",\n  \"voltage\": 218.4,\n  \"current\": 45.5,\n  \"power_factor\": 0.88,\n  \"temperature\": 31.0,\n  \"humidity\": 70.0\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8000/predict/grid-quality",
-							"protocol": "http",
+							"raw": "{{GATEWAY_URL}}/predict/grid-quality",
 							"host": [
-								"localhost"
+								"{{GATEWAY_URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"predict",
 								"grid-quality"
@@ -468,6 +472,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
 							}
 						],
 						"body": {
@@ -475,12 +483,10 @@
 							"raw": "{\n  \"id\": \"REQ-ANOMALY-001\",\n  \"timestamp\": \"2026-06-27T12:00:00Z\",\n  \"zone\": \"Pasar Tradisional\",\n  \"sensor_value\": 195.0,\n  \"timestamp_hour\": 14,\n  \"rolling_mean_1h\": 205.5,\n  \"z_score\": -2.5\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8000/detect/anomaly",
-							"protocol": "http",
+							"raw": "{{GATEWAY_URL}}/detect/anomaly",
 							"host": [
-								"localhost"
+								"{{GATEWAY_URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"detect",
 								"anomaly"
@@ -497,6 +503,10 @@
 							{
 								"key": "Content-Type",
 								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
 							}
 						],
 						"body": {
@@ -504,12 +514,10 @@
 							"raw": "{\n  \"requests\": [\n    {\n      \"id\": \"REQ-BATCH-001\",\n      \"timestamp\": \"2026-06-27T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 32.5,\n      \"prev_demand\": 73.5,\n      \"zone\": \"Kawasan Industri A\"\n    },\n    {\n      \"id\": \"REQ-BATCH-002\",\n      \"timestamp\": \"2026-06-27T12:00:00Z\",\n      \"hour\": 14,\n      \"day_of_week\": 5,\n      \"temperature\": 31.0,\n      \"prev_demand\": 8.5,\n      \"zone\": \"Perumahan Griya\"\n    }\n  ]\n}"
 						},
 						"url": {
-							"raw": "http://localhost:8000/predict/batch",
-							"protocol": "http",
+							"raw": "{{GATEWAY_URL}}/predict/batch",
 							"host": [
-								"localhost"
+								"{{GATEWAY_URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"predict",
 								"batch"
@@ -522,14 +530,17 @@
 					"name": "Get Feature Importance",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{ACCESS_TOKEN}}"
+							}
+						],
 						"url": {
-							"raw": "http://localhost:8000/model/feature-importance",
-							"protocol": "http",
+							"raw": "{{GATEWAY_URL}}/model/feature-importance",
 							"host": [
-								"localhost"
+								"{{GATEWAY_URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"model",
 								"feature-importance"
@@ -544,12 +555,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/health",
+							"raw": "http://localhost:5000/health",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8000",
+							"port": "5000",
 							"path": [
 								"health"
 							]
